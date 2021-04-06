@@ -1,9 +1,11 @@
 package sk.koronapp
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.widget.doAfterTextChanged
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_login.*
@@ -16,14 +18,40 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        login_button.isEnabled = true
-        login_button.setOnClickListener{
-            sendRequest(username.text.toString().trim(), password.text.toString().trim(), "login")
+        usernameField.doAfterTextChanged {
+            textWatch()
         }
 
-        register_button.isEnabled = true
+        passwordField.doAfterTextChanged {
+            textWatch()
+        }
+
+        login_button.setOnClickListener{
+            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), "login")
+        }
+
         register_button.setOnClickListener{
-            sendRequest(username.text.toString().trim(), password.text.toString().trim(), "register")
+            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), "register")
+        }
+    }
+
+    private fun textWatch(){
+        val usernameEmpty: Boolean = usernameField.text.toString().trim().isEmpty()
+        val passwordEmpty: Boolean = passwordField.text.toString().trim().isEmpty()
+
+        if(usernameEmpty || passwordEmpty){
+            login_button.isEnabled = false
+            login_button.setBackgroundColor(resources.getColor(R.color.colorButtonShade))
+
+            register_button.isEnabled = false
+            register_button.setBackgroundColor(resources.getColor(R.color.colorButtonShadeLight))
+        }
+        else{
+            login_button.isEnabled = true
+            login_button.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+
+            register_button.isEnabled = true
+            register_button.setBackgroundColor(resources.getColor(R.color.colorPrimaryLight))
         }
     }
 
