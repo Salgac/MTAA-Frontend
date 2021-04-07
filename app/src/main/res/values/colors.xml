@@ -5,4 +5,7 @@
     <color name="colorPrimaryLight">#4EA5D9</color>
     <color name="colorAccent">#44CFCB</color>
     <color name="colorDark">#122C34</color>
+
+    <color name="colorButtonShade">#939393</color>
+    <color name="colorButtonShadeLight">#D8D8D8</color>
 </resources>
