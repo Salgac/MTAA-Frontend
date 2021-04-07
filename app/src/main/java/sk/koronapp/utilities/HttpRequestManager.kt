@@ -18,12 +18,14 @@ class HttpRequestManager {
             type: RequestType,
             method: Int,
             handlerFunction: (response:JSONObject) -> Unit,
-            token: String = ""
+            token: String = "",
+            urlExtra: String = ""
         ) {
             val que = Volley.newRequestQueue(context)
+            val url = getUrlFromType(type) + urlExtra
 
             val jsonObjectRequest = object : JsonObjectRequest(
-                method, getUrlFromType(type), jsonObj,
+                method, url , jsonObj,
                 { response ->
                     handlerFunction(response)
                 }, { error ->
