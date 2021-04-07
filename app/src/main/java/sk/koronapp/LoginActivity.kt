@@ -1,34 +1,30 @@
 package sk.koronapp
 
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.widget.doAfterTextChanged
 import com.android.volley.Request.Method
 import kotlinx.android.synthetic.main.activity_login.*
 import org.json.JSONObject
 import sk.koronapp.models.User
+import sk.koronapp.utilities.AddressManager
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
 import sk.koronapp.utilities.ResponseInterface
 import java.io.Serializable
 import java.util.*
 
-class LoginActivity : AppCompatActivity(), LocationListener, ResponseInterface {
+class LoginActivity : AppCompatActivity(), ResponseInterface {
 
-    private var address: String = "none"
+    private lateinit var addressManager:AddressManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        addressManager = AddressManager(this)
 
         usernameField.doAfterTextChanged {
             textWatch()
@@ -74,11 +70,8 @@ class LoginActivity : AppCompatActivity(), LocationListener, ResponseInterface {
         jsonObj.put("username",username)
         jsonObj.put("password",password)
         if(type==RequestType.REGISTER){
-            updateAddress()
-            jsonObj.put("address",this.address)
-            Toast.makeText(this, this.address, Toast.LENGTH_LONG).show()
+                jsonObj.put("address", addressManager.getAddress())
         }
-
         //send request and get response
         HttpRequestManager.sendRequest(this, jsonObj, type, Method.POST, ::responseHandler)
     }
@@ -106,49 +99,4 @@ class LoginActivity : AppCompatActivity(), LocationListener, ResponseInterface {
         intent.putExtra("user", user as Serializable)
         startActivity(intent)
     }
-
-    //updates location and address line
-    private fun updateAddress(){
-        //check permissions
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            //ask for permissions
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),2)
-            return updateAddress()
-        }
-
-        //update location
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5f,this)
-    }
-
-    override fun onLocationChanged(location: Location?) {
-        if (location != null) {
-            //get current address from location and return in into variable
-            val geocoder = Geocoder(this, Locale.getDefault())
-            val addresses = geocoder.getFromLocation(location.latitude,location.longitude,1)
-
-            this.address = addresses[0].getAddressLine(0)
-        }
-        else{
-            //handle error
-            Toast.makeText(this, "Location error", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onProviderEnabled(provider: String?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onProviderDisabled(provider: String?) {
-        TODO("Not yet implemented")
-    }
-
 }
