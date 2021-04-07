@@ -12,16 +12,17 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.widget.doAfterTextChanged
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
+import com.android.volley.Request.Method
 import kotlinx.android.synthetic.main.activity_login.*
 import org.json.JSONObject
 import sk.koronapp.models.User
+import sk.koronapp.utilities.HttpRequestManager
+import sk.koronapp.utilities.RequestType
+import sk.koronapp.utilities.ResponseInterface
 import java.io.Serializable
 import java.util.*
-import kotlin.collections.HashMap
 
-class LoginActivity : AppCompatActivity(), LocationListener {
+class LoginActivity : AppCompatActivity(), LocationListener, ResponseInterface {
 
     private var address: String = "none"
 
@@ -38,11 +39,11 @@ class LoginActivity : AppCompatActivity(), LocationListener {
         }
 
         login_button.setOnClickListener{
-            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), "login")
+            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), RequestType.LOGIN)
         }
 
         register_button.setOnClickListener{
-            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), "register")
+            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), RequestType.REGISTER)
         }
     }
 
@@ -67,52 +68,43 @@ class LoginActivity : AppCompatActivity(), LocationListener {
     }
 
     //function that sends requests
-    private fun sendRequest(username:String, password:String, type:String){
-
-        val que = Volley.newRequestQueue(this)
+    private fun sendRequest(username:String, password:String, type:RequestType){
 
         val jsonObj = JSONObject()
         jsonObj.put("username",username)
         jsonObj.put("password",password)
-        if(type=="register"){
+        if(type==RequestType.REGISTER){
             updateAddress()
             jsonObj.put("address",this.address)
             Toast.makeText(this, this.address, Toast.LENGTH_LONG).show()
         }
 
-        val url= "http://139.162.130.177:8000/api/$type/"
+        //send request and get response
+        HttpRequestManager.sendRequest(this, jsonObj, type, Method.POST, ::responseHandler)
+    }
 
-        val jsonObjectRequest = object : JsonObjectRequest(
-            Method.POST, url, jsonObj,
-            { response ->
-                Toast.makeText(this,"login",Toast.LENGTH_LONG).show()
-                //create new user
-                val resp = JSONObject(response.toString())
-                val respObj = resp.getJSONObject("user")
+    override fun responseHandler(response:JSONObject){
+        //create new user
+        val resp = JSONObject(response.toString())
 
-                val token = resp.get("token").toString()
-                val username = respObj.get("username").toString()
-                val address = respObj.get("address").toString()
-                val avatar = respObj.get("avatar").toString()
-
-                val user = User(token,username,address,avatar)
-
-                //launch main activity
-                val intent = Intent(this@LoginActivity,MainActivity::class.java)
-                intent.putExtra("user", user as Serializable)
-                startActivity(intent)
-
-            }, { error ->
-                Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show()
-            }){
-            override fun getHeaders(): MutableMap<String, String> {
-                val params: MutableMap<String,String> = HashMap()
-                params["Content-Type"] = "application/json"
-                return params
-            }
+        if(!resp.has("user")){
+            //TODO: error handling
+            Toast.makeText(this, resp.toString(), Toast.LENGTH_SHORT).show()
+            return
         }
 
-        que.add(jsonObjectRequest)
+        val token = resp.get("token").toString()
+        val respObj = resp.getJSONObject("user")
+        val username = respObj.get("username").toString()
+        val address = respObj.get("address").toString()
+        val avatar = respObj.get("avatar").toString()
+
+        val user = User(token,username,address,avatar)
+
+        //launch main activity
+        val intent = Intent(this@LoginActivity,MainActivity::class.java)
+        intent.putExtra("user", user as Serializable)
+        startActivity(intent)
     }
 
     //updates location and address line
