@@ -17,7 +17,8 @@ class HttpRequestManager {
             jsonObj: JSONObject,
             type: RequestType,
             method: Int,
-            handlerFunction: (response:JSONObject) -> Unit
+            handlerFunction: (response:JSONObject) -> Unit,
+            token: String = ""
         ) {
             val que = Volley.newRequestQueue(context)
 
@@ -31,6 +32,10 @@ class HttpRequestManager {
                 override fun getHeaders(): MutableMap<String, String> {
                     val params: MutableMap<String, String> = HashMap()
                     params["Content-Type"] = "application/json"
+
+                    if(token != ""){
+                        params["Authorization"] = "Token $token"
+                    }
                     return params
                 }
             }
