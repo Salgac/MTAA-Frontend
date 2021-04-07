@@ -24,24 +24,31 @@
         android:paddingBottom="20dp"
         android:autofillHints="" />
 
-    <EditText
-        android:id="@+id/passwordField"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/passwordLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/usernameField"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="11dp"
-        android:hint="@string/password"
-        android:inputType="textPassword"
         android:paddingBottom="20dp"
-        android:autofillHints="" />
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/passwordField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:autofillHints="" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/login_button"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_below="@+id/passwordField"
+        android:layout_below="@+id/passwordLayout"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="30dp"
