@@ -1,11 +1,12 @@
 package sk.koronapp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.android.volley.Request.Method
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.android.synthetic.main.activity_login.*
 import org.json.JSONObject
 import sk.koronapp.models.User
@@ -76,11 +77,11 @@ class LoginActivity : AppCompatActivity(), ResponseInterface {
         HttpRequestManager.sendRequest(this, jsonObj, type, Method.POST, ::responseHandler)
     }
 
-    override fun responseHandler(response:JSONObject){
+    override fun responseHandler(response: Any) {
         //create new user
         val resp = JSONObject(response.toString())
 
-        if(!resp.has("user")){
+        if (!resp.has("user")) {
             //TODO: error handling
             Toast.makeText(this, resp.toString(), Toast.LENGTH_SHORT).show()
             return
@@ -88,11 +89,9 @@ class LoginActivity : AppCompatActivity(), ResponseInterface {
 
         val token = resp.get("token").toString()
         val respObj = resp.getJSONObject("user")
-        val username = respObj.get("username").toString()
-        val address = respObj.get("address").toString()
-        val avatar = respObj.get("avatar").toString()
+        val user = ObjectMapper().readValue(respObj.toString(), User::class.java)
 
-        val user = User(token,username,address,avatar)
+        HttpRequestManager.setToken(token)
 
         //launch main activity
         val intent = Intent(this@LoginActivity,MainActivity::class.java)

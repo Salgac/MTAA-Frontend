@@ -6,10 +6,10 @@
         app:startDestination="@+id/navigation_home">
 
     <fragment
-            android:id="@+id/navigation_home"
-            android:name="sk.koronapp.ui.home.HomeFragment"
-            android:label="@string/title_home"
-            tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_home"
+        android:name="sk.koronapp.ui.home.DemandFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/demand_list" />
 
     <fragment
             android:id="@+id/navigation_dashboard"
