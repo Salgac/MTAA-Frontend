@@ -10,30 +10,9 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <ProgressBar
-            android:id="@+id/demand_progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible" />
-
-        <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/demand_avatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:srcCompat="@tools:sample/avatars" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="5dp"
         android:layout_weight="4"
         android:orientation="vertical"
         tools:ignore="UselessParent">
@@ -59,4 +38,26 @@
             android:textSize="@dimen/demand_list_date" />
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ProgressBar
+            android:id="@+id/demand_progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/demand_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+    </LinearLayout>
+
 </LinearLayout>
