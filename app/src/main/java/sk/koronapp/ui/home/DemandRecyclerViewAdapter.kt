@@ -1,6 +1,7 @@
 package sk.koronapp.ui.home
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +35,7 @@ class DemandRecyclerViewAdapter(private val context: Context, private val demand
 
         val imageLoader = HttpRequestManager.getImageLoader(context)
         imageLoader.setProgressBar(holder.progressBar)
+        holder.avatar.setErrorImageBitmap(BitmapFactory.decodeStream(context.resources.assets.open("default_avatar.png")))
         holder.avatar.setImageUrl(Urls.AVATAR + demand.client.avatar, imageLoader)
     }
 

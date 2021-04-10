@@ -69,11 +69,11 @@ class HttpRequestManager {
             que.add(jsonArrayRequest)
         }
 
+        private val cache: LruCache<String, Bitmap> = LruCache<String, Bitmap>(20)
         fun getImageLoader(context: Context): CustomImageLoader {
             return CustomImageLoader(
                 Volley.newRequestQueue(context),
                 object : ImageLoader.ImageCache {
-                    private val cache: LruCache<String, Bitmap> = LruCache<String, Bitmap>(20)
                     override fun getBitmap(url: String): Bitmap? {
                         return cache.get(url)
                     }

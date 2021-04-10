@@ -28,6 +28,21 @@ class CustomImageLoader(queue: RequestQueue, imageCache: ImageCache) :
             progressBar!!.visibility = View.GONE
     }
 
+    override fun get(
+        requestUrl: String?,
+        imageListener: ImageListener?,
+        maxWidth: Int,
+        maxHeight: Int,
+        scaleType: ImageView.ScaleType?
+    ): ImageContainer {
+        showProgressBar()
+        val imageContainer = super.get(requestUrl, imageListener, maxWidth, maxHeight, scaleType)
+        if (imageContainer.bitmap != null) {
+            hideProgressBar()
+        }
+        return imageContainer
+    }
+
     /**
      * Overriding of this method was necessary to add authorization header,
      * because in image loader it has protected modifier.
@@ -39,7 +54,6 @@ class CustomImageLoader(queue: RequestQueue, imageCache: ImageCache) :
         scaleType: ImageView.ScaleType?,
         cacheKey: String?
     ): Request<Bitmap> {
-        showProgressBar()
         return object : ImageRequest(
             requestUrl,
             Response.Listener {
@@ -52,7 +66,6 @@ class CustomImageLoader(queue: RequestQueue, imageCache: ImageCache) :
             Bitmap.Config.RGB_565,
             Response.ErrorListener {
                 onGetImageError(cacheKey, it)
-                hideProgressBar()
             }) {
             override fun getHeaders(): MutableMap<String, String> {
                 return HttpRequestManager.defaultHeaders()
