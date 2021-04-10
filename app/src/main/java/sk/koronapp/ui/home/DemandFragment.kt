@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.android.synthetic.main.demand_list_item.view.*
+import org.json.JSONArray
 import sk.koronapp.R
 import sk.koronapp.models.Demand
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
-import sk.koronapp.utilities.ResponseInterface
 
-class DemandFragment : Fragment(), ResponseInterface {
+class DemandFragment : Fragment() {
 
-    private var demandList: Array<Demand> = emptyArray()
+    private lateinit var demandList: Array<Demand>
     private lateinit var view: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,19 @@ class DemandFragment : Fragment(), ResponseInterface {
         HttpRequestManager.sendRequestForJsonArray(
             requireContext(),
             RequestType.DEMAND,
-            ::responseHandler
+            { jsonArray: JSONArray, success: Boolean ->
+                if (success) {
+                    demandList =
+                        ObjectMapper().readValue(jsonArray.toString(), Array<Demand>::class.java)
+
+                    with(view) {
+                        layoutManager = LinearLayoutManager(context)
+                        adapter = DemandRecyclerViewAdapter(context, demandList)
+                    }
+                } else {
+                    TODO("Error popup")
+                }
+            }
         )
     }
 
@@ -34,15 +46,6 @@ class DemandFragment : Fragment(), ResponseInterface {
     ): View {
         view = inflater.inflate(R.layout.demand_list, container, false) as RecyclerView
         return view
-    }
-
-    override fun responseHandler(response: Any) {
-        demandList = ObjectMapper().readValue(response.toString(), Array<Demand>::class.java)
-
-        with(view) {
-            layoutManager = LinearLayoutManager(context)
-            adapter = DemandRecyclerViewAdapter(context, demandList)
-        }
     }
 
 }

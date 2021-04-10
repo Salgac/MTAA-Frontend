@@ -13,13 +13,12 @@ import sk.koronapp.models.User
 import sk.koronapp.utilities.AddressManager
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
-import sk.koronapp.utilities.ResponseInterface
 import java.io.Serializable
 import java.util.*
 
-class LoginActivity : AppCompatActivity(), ResponseInterface {
+class LoginActivity : AppCompatActivity() {
 
-    private lateinit var addressManager:AddressManager
+    private lateinit var addressManager: AddressManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,18 +43,17 @@ class LoginActivity : AppCompatActivity(), ResponseInterface {
         }
     }
 
-    private fun textWatch(){
+    private fun textWatch() {
         val usernameEmpty: Boolean = usernameField.text.toString().trim().isEmpty()
         val passwordEmpty: Boolean = passwordField.text.toString().trim().isEmpty()
 
-        if(usernameEmpty || passwordEmpty){
+        if (usernameEmpty || passwordEmpty) {
             login_button.isEnabled = false
             login_button.setBackgroundColor(resources.getColor(R.color.colorButtonShade))
 
             register_button.isEnabled = false
             register_button.setBackgroundColor(resources.getColor(R.color.colorButtonShadeLight))
-        }
-        else{
+        } else {
             login_button.isEnabled = true
             login_button.setBackgroundColor(resources.getColor(R.color.colorPrimary))
 
@@ -65,37 +63,35 @@ class LoginActivity : AppCompatActivity(), ResponseInterface {
     }
 
     //function that sends requests
-    private fun sendRequest(username:String, password:String, type:RequestType){
+    private fun sendRequest(username: String, password: String, type: RequestType) {
 
         val jsonObj = JSONObject()
-        jsonObj.put("username",username)
-        jsonObj.put("password",password)
-        if(type==RequestType.REGISTER){
-                jsonObj.put("address", addressManager.getAddress())
+        jsonObj.put("username", username)
+        jsonObj.put("password", password)
+        if (type == RequestType.REGISTER) {
+            jsonObj.put("address", addressManager.getAddress())
         }
         //send request and get response
-        HttpRequestManager.sendRequest(this, jsonObj, type, Method.POST, ::responseHandler)
+        HttpRequestManager.sendRequest(this, jsonObj, type, Method.POST,
+            fun(jsonObject: JSONObject, success: Boolean) {
+                //create new user
+                if (!success) {
+                    //TODO: error handling
+                    Toast.makeText(this, jsonObject.toString(), Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                val token = jsonObject.get("token").toString()
+                val userJson = jsonObject.getJSONObject("user")
+                val user = ObjectMapper().readValue(userJson.toString(), User::class.java)
+
+                HttpRequestManager.setToken(token)
+
+                //launch main activity
+                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                intent.putExtra("user", user as Serializable)
+                startActivity(intent)
+            })
     }
 
-    override fun responseHandler(response: Any) {
-        //create new user
-        val resp = JSONObject(response.toString())
-
-        if (!resp.has("user")) {
-            //TODO: error handling
-            Toast.makeText(this, resp.toString(), Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val token = resp.get("token").toString()
-        val respObj = resp.getJSONObject("user")
-        val user = ObjectMapper().readValue(respObj.toString(), User::class.java)
-
-        HttpRequestManager.setToken(token)
-
-        //launch main activity
-        val intent = Intent(this@LoginActivity,MainActivity::class.java)
-        intent.putExtra("user", user as Serializable)
-        startActivity(intent)
-    }
 }

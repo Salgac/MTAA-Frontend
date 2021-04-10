@@ -27,7 +27,7 @@ class HttpRequestManager {
             jsonObj: JSONObject,
             type: RequestType,
             method: Int,
-            handlerFunction: (response: JSONObject) -> Unit,
+            handlerFunction: (response: JSONObject, success: Boolean) -> Unit,
             urlExtra: String = ""
         ) {
             val que = Volley.newRequestQueue(context)
@@ -36,9 +36,9 @@ class HttpRequestManager {
             val jsonObjectRequest = object : JsonObjectRequest(
                 method, url, jsonObj,
                 { response ->
-                    handlerFunction(response)
+                    handlerFunction(response, true)
                 }, { error ->
-                    handlerFunction(JSONObject(String(error.networkResponse.data)))
+                    handlerFunction(JSONObject(String(error.networkResponse.data)), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
@@ -50,7 +50,7 @@ class HttpRequestManager {
         fun sendRequestForJsonArray(
             context: Context,
             type: RequestType,
-            handlerFunction: (response: JSONArray) -> Unit,
+            handlerFunction: (response: JSONArray, success: Boolean) -> Unit,
             urlExtra: String = ""
         ) {
             val que = Volley.newRequestQueue(context)
@@ -58,9 +58,9 @@ class HttpRequestManager {
 
             val jsonArrayRequest = object : JsonArrayRequest(url,
                 { response ->
-                    handlerFunction(response)
+                    handlerFunction(response, true)
                 }, { error ->
-                    handlerFunction(JSONArray(String(error.networkResponse.data)))
+                    handlerFunction(JSONArray(String(error.networkResponse.data)), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
@@ -105,8 +105,4 @@ class HttpRequestManager {
         }
 
     }
-}
-
-interface ResponseInterface {
-    fun responseHandler(response: Any)
 }
