@@ -32,7 +32,7 @@ class Demand(
     @JsonProperty("items")
     val items: List<Item>?
 ) {
-    val formatter: SimpleDateFormat = SimpleDateFormat("dd.MM hh:mm")
+    private val formatter: SimpleDateFormat = SimpleDateFormat("dd.MM HH:mm")
     fun expiredAtString(): String {
         return formatter.format(expiredAt)
     }
