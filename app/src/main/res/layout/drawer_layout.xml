@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:background="@color/colorPrimaryLight"
@@ -9,21 +9,21 @@
     android:paddingLeft="20dp"
     android:paddingBottom="20dp">
 
-    <ImageView
+    <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/drawer_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@mipmap/ic_launcher" />
+        tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
+        android:id="@+id/drawer_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Title"
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/drawer_address"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="blablablablablablablabl" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
