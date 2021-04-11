@@ -9,6 +9,7 @@
     <string name="log_in">Log In</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
+    <string name="pass_error_length">Password must be at least 6 characters long</string>
 
     <string name="tab_client">Client</string>
     <string name="tab_volunteer">Volunteer</string>

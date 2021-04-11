@@ -19,6 +19,7 @@ import java.util.*
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var addressManager: AddressManager
+    private var userIsDummy = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +35,33 @@ class LoginActivity : AppCompatActivity() {
             textWatch()
         }
 
-        login_button.setOnClickListener{
-            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), RequestType.LOGIN)
+        login_button.setOnClickListener {
+            if (passwordLengthValidator())
+                sendRequest(
+                    usernameField.text.toString().trim(),
+                    passwordField.text.toString().trim(),
+                    RequestType.LOGIN
+                )
         }
 
-        register_button.setOnClickListener{
-            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), RequestType.REGISTER)
+        register_button.setOnClickListener {
+            if (passwordLengthValidator())
+                sendRequest(
+                    usernameField.text.toString().trim(),
+                    passwordField.text.toString().trim(),
+                    RequestType.REGISTER
+                )
+        }
+    }
+
+    private fun passwordLengthValidator(): Boolean {
+        return if (passwordField.text.toString().trim().length < 6) {
+            passwordLayout.error = getString(R.string.pass_error_length)
+            userIsDummy = true
+            false
+        } else {
+            passwordLayout.error = null
+            true
         }
     }
 
@@ -49,16 +71,19 @@ class LoginActivity : AppCompatActivity() {
 
         if (usernameEmpty || passwordEmpty) {
             login_button.isEnabled = false
-            login_button.setBackgroundColor(resources.getColor(R.color.colorButtonShade))
-
             register_button.isEnabled = false
-            register_button.setBackgroundColor(resources.getColor(R.color.colorButtonShadeLight))
         } else {
             login_button.isEnabled = true
-            login_button.setBackgroundColor(resources.getColor(R.color.colorPrimary))
-
             register_button.isEnabled = true
-            register_button.setBackgroundColor(resources.getColor(R.color.colorPrimaryLight))
+        }
+
+        //check for password length
+        if (userIsDummy) {
+            if (passwordField.text.toString().length >= 6) {
+                passwordLayout.error = null
+            } else {
+                passwordLayout.error = getString(R.string.pass_error_length)
+            }
         }
     }
 

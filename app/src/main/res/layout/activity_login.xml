@@ -56,7 +56,8 @@
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textAllCaps="false"
-        android:background="@color/colorButtonShade"
+        android:background="@color/colorPrimary"
+        android:foreground="?android:attr/selectableItemBackground"
         android:enabled="false"/>
 
     <Button
@@ -71,7 +72,8 @@
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textAllCaps="false"
-        android:background="@color/colorButtonShadeLight"
+        android:background="@color/colorPrimaryLight"
+        android:foreground="?android:attr/selectableItemBackground"
         android:enabled="false"/>
 
 </RelativeLayout>
