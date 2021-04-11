@@ -85,6 +85,10 @@ class LoginActivity : AppCompatActivity() {
                 passwordLayout.error = getString(R.string.pass_error_length)
             }
         }
+
+        //clear error messages
+        usernameLayout.error = null
+        inputLayout.error = null
     }
 
     //function that sends requests
@@ -101,8 +105,13 @@ class LoginActivity : AppCompatActivity() {
             fun(jsonObject: JSONObject, success: Boolean) {
                 //create new user
                 if (!success) {
-                    //TODO: error handling
-                    Toast.makeText(this, jsonObject.toString(), Toast.LENGTH_SHORT).show()
+                    if (jsonObject.has("detail")) {
+                        //auth error - throw error
+                        inputLayout.error = getString(R.string.auth_error)
+                    } else if (jsonObj.has("username")) {
+                        //username already exists - throw error on username
+                        usernameLayout.error = getString(R.string.reg_error_duplicate)
+                    }
                     return
                 }
 
