@@ -20,4 +20,9 @@
         <item name="android:textSize">70sp</item>
     </style>
 
+    <style name="MainTitle">
+        <item name="android:fontFamily">@font/acme</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+
 </resources>
