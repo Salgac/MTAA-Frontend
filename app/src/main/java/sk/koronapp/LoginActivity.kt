@@ -113,7 +113,7 @@ class LoginActivity : AppCompatActivity() {
                     if (jsonObject.has("detail")) {
                         //auth error - throw error
                         inputLayout.error = getString(R.string.auth_error)
-                    } else if (jsonObj.has("username")) {
+                    } else if (jsonObject.has("username")) {
                         //username already exists - throw error on username
                         usernameLayout.error = getString(R.string.reg_error_duplicate)
                     }
