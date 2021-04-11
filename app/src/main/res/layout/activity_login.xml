@@ -8,6 +8,7 @@
         android:id="@+id/login_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         app:title="@string/log_in"
         app:titleTextColor="@color/colorPrimary" />
 
@@ -18,14 +19,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/login_toolbar"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="25dp"
         android:layout_marginRight="20dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/usernameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/login_toolbar"
-            android:layout_marginTop="100dp">
+            android:layout_below="@+id/login_toolbar">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/usernameField"
@@ -42,7 +43,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/usernameLayout"
             android:layout_marginTop="11dp"
-            android:paddingBottom="20dp"
             app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -62,7 +62,7 @@
         android:layout_height="60dp"
         android:layout_below="@+id/inputLayout"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="40dp"
         android:layout_marginRight="20dp"
         android:background="@color/colorPrimary"
         android:enabled="false"

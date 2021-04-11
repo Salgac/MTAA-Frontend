@@ -2,7 +2,6 @@ package sk.koronapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.android.volley.Request.Method
@@ -26,6 +25,8 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         addressManager = AddressManager(this)
+
+        login_toolbar.setTitleTextAppearance(this, R.style.CustomLoginTitle)
 
         usernameField.doAfterTextChanged {
             textWatch()

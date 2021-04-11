@@ -15,4 +15,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="CustomLoginTitle">
+        <item name="android:fontFamily">@font/acme</item>
+        <item name="android:textSize">70sp</item>
+    </style>
+
 </resources>
