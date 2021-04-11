@@ -2,11 +2,15 @@ package sk.koronapp.ui.demand_list
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.NetworkImageView
@@ -21,12 +25,12 @@ import sk.koronapp.utilities.Urls
 class DemandRecyclerViewAdapter(
     private val context: Context,
     private val demands: Array<Demand>,
-    private val avatarLeft: Boolean = true
+    private val client: Boolean = true
 ) :
     RecyclerView.Adapter<DemandRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val viewId = if (avatarLeft)
+        val viewId = if (client)
             R.layout.demand_list_item
         else
             R.layout.demand_list_item_avatar_right
@@ -44,7 +48,25 @@ class DemandRecyclerViewAdapter(
         val imageLoader = HttpRequestManager.getImageLoader(context)
         imageLoader.setProgressBar(holder.progressBar)
         holder.avatar.setErrorImageBitmap(BitmapFactory.decodeStream(context.resources.assets.open("default_avatar.png")))
-        holder.avatar.setImageUrl(Urls.AVATAR + demand.client.avatar, imageLoader)
+        if (!client) {
+            holder.avatar.setImageUrl(Urls.AVATAR + demand.client.avatar, imageLoader)
+        } else if (demand.volunteer != null) {
+            holder.avatar.setImageUrl(Urls.AVATAR + demand.volunteer.avatar, imageLoader)
+        } else {
+            holder.imageLayout.visibility = View.GONE
+        }
+        val shape = RoundRectShape(floatArrayOf(12F, 12F, 12F, 12F, 12F, 12F, 12F, 12F), null, null)
+        val shapeDrawable = ShapeDrawable(shape)
+        var color = R.color.stateCreated
+        when (demand.state) {
+            Demand.State.created -> color = R.color.stateCreated
+            Demand.State.accepted -> color = R.color.stateAccepted
+            Demand.State.completed -> color = R.color.stateCompleted
+            Demand.State.approved -> color = R.color.stateApproved
+            Demand.State.expired -> color = R.color.stateExpired
+        }
+        shapeDrawable.paint.color = ContextCompat.getColor(context, color)
+        holder.itemView.background = shapeDrawable
     }
 
     private fun onDemandClicked(context: Context, demandId: Int) {
@@ -83,6 +105,7 @@ class DemandRecyclerViewAdapter(
         val expiredAt: TextView = view.findViewById(R.id.demand_expired_at)
         val avatar: NetworkImageView = view.findViewById(R.id.demand_avatar)
         val progressBar: ProgressBar = view.findViewById(R.id.demand_progress_bar)
+        val imageLayout: LinearLayout = view.findViewById(R.id.demand_image_layout)
         override fun toString(): String {
             return title.text as String
         }
