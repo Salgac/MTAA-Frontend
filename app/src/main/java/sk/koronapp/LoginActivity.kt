@@ -37,21 +37,25 @@ class LoginActivity : AppCompatActivity() {
         }
 
         login_button.setOnClickListener {
-            if (passwordLengthValidator())
+            if (passwordLengthValidator()) {
+                login_button.isEnabled = false
                 sendRequest(
                     usernameField.text.toString().trim(),
                     passwordField.text.toString().trim(),
                     RequestType.LOGIN
                 )
+            }
         }
 
         register_button.setOnClickListener {
-            if (passwordLengthValidator())
+            if (passwordLengthValidator()) {
+                register_button.isEnabled = false
                 sendRequest(
                     usernameField.text.toString().trim(),
                     passwordField.text.toString().trim(),
                     RequestType.REGISTER
                 )
+            }
         }
     }
 
@@ -104,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
         //send request and get response
         HttpRequestManager.sendRequest(this, jsonObj, type, Method.POST,
             fun(jsonObject: JSONObject, success: Boolean) {
-                //create new user
+                //handle errors
                 if (!success) {
                     if (jsonObject.has("detail")) {
                         //auth error - throw error
@@ -113,9 +117,13 @@ class LoginActivity : AppCompatActivity() {
                         //username already exists - throw error on username
                         usernameLayout.error = getString(R.string.reg_error_duplicate)
                     }
+                    //enable buttons
+                    login_button.isEnabled = true
+                    register_button.isEnabled = true
                     return
                 }
 
+                //create new user
                 val token = jsonObject.get("token").toString()
                 val userJson = jsonObject.getJSONObject("user")
                 val user = ObjectMapper().readValue(userJson.toString(), User::class.java)
