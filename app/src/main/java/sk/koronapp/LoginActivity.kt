@@ -2,7 +2,6 @@ package sk.koronapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.android.volley.Request.Method
@@ -19,12 +18,15 @@ import java.util.*
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var addressManager: AddressManager
+    private var userIsDummy = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
         addressManager = AddressManager(this)
+
+        login_toolbar.setTitleTextAppearance(this, R.style.CustomLoginTitle)
 
         usernameField.doAfterTextChanged {
             textWatch()
@@ -34,12 +36,37 @@ class LoginActivity : AppCompatActivity() {
             textWatch()
         }
 
-        login_button.setOnClickListener{
-            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), RequestType.LOGIN)
+        login_button.setOnClickListener {
+            if (passwordLengthValidator()) {
+                login_button.isEnabled = false
+                sendRequest(
+                    usernameField.text.toString().trim(),
+                    passwordField.text.toString().trim(),
+                    RequestType.LOGIN
+                )
+            }
         }
 
-        register_button.setOnClickListener{
-            sendRequest(usernameField.text.toString().trim(), passwordField.text.toString().trim(), RequestType.REGISTER)
+        register_button.setOnClickListener {
+            if (passwordLengthValidator()) {
+                register_button.isEnabled = false
+                sendRequest(
+                    usernameField.text.toString().trim(),
+                    passwordField.text.toString().trim(),
+                    RequestType.REGISTER
+                )
+            }
+        }
+    }
+
+    private fun passwordLengthValidator(): Boolean {
+        return if (passwordField.text.toString().trim().length < 6) {
+            passwordLayout.error = getString(R.string.pass_error_length)
+            userIsDummy = true
+            false
+        } else {
+            passwordLayout.error = null
+            true
         }
     }
 
@@ -49,17 +76,24 @@ class LoginActivity : AppCompatActivity() {
 
         if (usernameEmpty || passwordEmpty) {
             login_button.isEnabled = false
-            login_button.setBackgroundColor(resources.getColor(R.color.colorButtonShade))
-
             register_button.isEnabled = false
-            register_button.setBackgroundColor(resources.getColor(R.color.colorButtonShadeLight))
         } else {
             login_button.isEnabled = true
-            login_button.setBackgroundColor(resources.getColor(R.color.colorPrimary))
-
             register_button.isEnabled = true
-            register_button.setBackgroundColor(resources.getColor(R.color.colorPrimaryLight))
         }
+
+        //check for password length
+        if (userIsDummy) {
+            if (passwordField.text.toString().length >= 6) {
+                passwordLayout.error = null
+            } else {
+                passwordLayout.error = getString(R.string.pass_error_length)
+            }
+        }
+
+        //clear error messages
+        usernameLayout.error = null
+        inputLayout.error = null
     }
 
     //function that sends requests
@@ -74,13 +108,22 @@ class LoginActivity : AppCompatActivity() {
         //send request and get response
         HttpRequestManager.sendRequest(this, jsonObj, type, Method.POST,
             fun(jsonObject: JSONObject, success: Boolean) {
-                //create new user
+                //handle errors
                 if (!success) {
-                    //TODO: error handling
-                    Toast.makeText(this, jsonObject.toString(), Toast.LENGTH_SHORT).show()
+                    if (jsonObject.has("detail")) {
+                        //auth error - throw error
+                        inputLayout.error = getString(R.string.auth_error)
+                    } else if (jsonObject.has("username")) {
+                        //username already exists - throw error on username
+                        usernameLayout.error = getString(R.string.reg_error_duplicate)
+                    }
+                    //enable buttons
+                    login_button.isEnabled = true
+                    register_button.isEnabled = true
                     return
                 }
 
+                //create new user
                 val token = jsonObject.get("token").toString()
                 val userJson = jsonObject.getJSONObject("user")
                 val user = ObjectMapper().readValue(userJson.toString(), User::class.java)
