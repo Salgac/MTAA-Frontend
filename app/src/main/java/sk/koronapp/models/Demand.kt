@@ -2,6 +2,7 @@ package sk.koronapp.models
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,13 +32,17 @@ class Demand(
 
     @JsonProperty("items")
     val items: List<Item>?
-) {
-    private val formatter: SimpleDateFormat = SimpleDateFormat("dd.MM HH:mm")
+) : Serializable {
+    private val formatter: SimpleDateFormat = SimpleDateFormat("dd.MM HH:mm", Locale.ENGLISH)
     fun expiredAtString(): String {
         return formatter.format(expiredAt)
     }
 
     fun createdAtString(): String {
         return formatter.format(expiredAt)
+    }
+
+    override fun toString(): String {
+        return title
     }
 }

@@ -1,7 +1,10 @@
 package sk.koronapp.models
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.io.Serializable
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Item(
     @JsonProperty("id")
     val id: Int,
@@ -10,7 +13,7 @@ class Item(
     @JsonProperty("quantity")
     val quantity: Float,
     @JsonProperty("unit")
-    val unit: Unit,
+    val unit: String,
     @JsonProperty("price")
     val price: Float
-)
+) : Serializable

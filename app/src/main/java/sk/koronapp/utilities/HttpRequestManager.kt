@@ -24,7 +24,7 @@ class HttpRequestManager {
         //function that sends requests
         fun sendRequest(
             context: Context,
-            jsonObj: JSONObject,
+            jsonObj: JSONObject?,
             type: RequestType,
             method: Int,
             handlerFunction: (response: JSONObject, success: Boolean) -> Unit,

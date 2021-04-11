@@ -6,12 +6,6 @@
     android:name="sk.koronapp.ui.home.DemandFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:alwaysDrawnWithCache="true"
-    android:clickable="true"
-    android:focusable="true"
-    android:persistentDrawingCache="all"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".ui.home.DemandFragment"
+    tools:context=".ui.demand_list.DemandListFragment"
     tools:listitem="@layout/demand_list_item" />

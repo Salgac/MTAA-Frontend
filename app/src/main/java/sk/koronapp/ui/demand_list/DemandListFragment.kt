@@ -1,4 +1,4 @@
-package sk.koronapp.ui.home
+package sk.koronapp.ui.demand_list
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,13 +15,17 @@ import sk.koronapp.models.Demand
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
 
-class DemandFragment : Fragment() {
+class DemandListFragment(private val queryPair: Pair<String, String>) : Fragment() {
 
     private lateinit var demandList: Array<Demand>
     private lateinit var view: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var avatarLeft = true
+        if (queryPair.first == "user") {
+            avatarLeft = queryPair.second == "client"
+        }
         HttpRequestManager.sendRequestForJsonArray(
             requireContext(),
             RequestType.DEMAND,
@@ -32,12 +36,13 @@ class DemandFragment : Fragment() {
 
                     with(view) {
                         layoutManager = LinearLayoutManager(context)
-                        adapter = DemandRecyclerViewAdapter(context, demandList)
+                        adapter = DemandRecyclerViewAdapter(context, demandList, avatarLeft)
                     }
                 } else {
                     TODO("Error popup")
                 }
-            }
+            },
+            "?" + queryPair.first + "=" + queryPair.second
         )
     }
 
