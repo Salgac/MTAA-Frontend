@@ -22,9 +22,9 @@ class DemandListFragment(private val queryPair: Pair<String, String>) : Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var avatarLeft = true
+        var client = true
         if (queryPair.first == "user") {
-            avatarLeft = queryPair.second == "client"
+            client = queryPair.second == "client"
         }
         HttpRequestManager.sendRequestForJsonArray(
             requireContext(),
@@ -36,7 +36,7 @@ class DemandListFragment(private val queryPair: Pair<String, String>) : Fragment
 
                     with(view) {
                         layoutManager = LinearLayoutManager(context)
-                        adapter = DemandRecyclerViewAdapter(context, demandList, avatarLeft)
+                        adapter = DemandRecyclerViewAdapter(context, demandList, client)
                     }
                 } else {
                     TODO("Error popup")

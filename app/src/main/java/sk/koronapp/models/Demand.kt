@@ -6,10 +6,6 @@ import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.*
 
-enum class State() {
-    created, accepted, completed, approved, expired,
-}
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Demand(
     @JsonProperty("id")
@@ -44,5 +40,9 @@ class Demand(
 
     override fun toString(): String {
         return title
+    }
+
+    enum class State() {
+        created, accepted, completed, approved, expired,
     }
 }

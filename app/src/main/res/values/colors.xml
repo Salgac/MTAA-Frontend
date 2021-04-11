@@ -6,6 +6,12 @@
     <color name="colorAccent">#44CFCB</color>
     <color name="colorDark">#122C34</color>
 
+    <color name="stateCreated">@color/colorPrimaryLight</color>
+    <color name="stateAccepted">#CDDC39</color>
+    <color name="stateCompleted">#7BB537</color>
+    <color name="stateApproved">@color/colorPrimaryDark</color>
+    <color name="stateExpired">#5E0202</color>
+
     <color name="colorButtonShade">#939393</color>
     <color name="colorButtonShadeLight">#D8D8D8</color>
 </resources>

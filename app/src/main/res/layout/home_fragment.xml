@@ -11,7 +11,7 @@
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary" />
+        android:background="@color/colorPrimaryLight" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
