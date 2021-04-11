@@ -3,12 +3,18 @@ package sk.koronapp.utilities
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.LruCache
+import android.widget.Toast
+import com.android.volley.NetworkError
+import com.android.volley.ServerError
+import com.android.volley.TimeoutError
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
+import sk.koronapp.R
 
 enum class RequestType {
     LOGIN, REGISTER, USER, AVATAR, DEMAND
@@ -38,7 +44,10 @@ class HttpRequestManager {
                 { response ->
                     handlerFunction(response, true)
                 }, { error ->
-                    handlerFunction(JSONObject(String(error.networkResponse.data)), false)
+                    if (noConnectionErrorPresent(context, error))
+                        handlerFunction(JSONObject(String(error.networkResponse.data)), false)
+                    else
+                        handlerFunction(JSONObject(),false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
@@ -60,7 +69,10 @@ class HttpRequestManager {
                 { response ->
                     handlerFunction(response, true)
                 }, { error ->
-                    handlerFunction(JSONArray(String(error.networkResponse.data)), false)
+                    if (noConnectionErrorPresent(context, error))
+                        handlerFunction(JSONArray(String(error.networkResponse.data)), false)
+                    else
+                        handlerFunction(JSONArray(),false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
@@ -104,5 +116,26 @@ class HttpRequestManager {
             }
         }
 
+        private fun noConnectionErrorPresent(context: Context, error: VolleyError): Boolean {
+            when (error) {
+                is NetworkError -> Toast.makeText(
+                    context,
+                    context.getString(R.string.error_connection),
+                    Toast.LENGTH_LONG
+                ).show()
+                is ServerError -> Toast.makeText(
+                    context,
+                    context.getString(R.string.error_server),
+                    Toast.LENGTH_LONG
+                ).show()
+                is TimeoutError -> Toast.makeText(
+                    context,
+                    context.getString(R.string.error_timeout),
+                    Toast.LENGTH_LONG
+                ).show()
+                else -> return true
+            }
+            return false
+        }
     }
 }

@@ -13,6 +13,10 @@
     <string name="reg_error_duplicate">Username already exists</string>
     <string name="auth_error">Username or password are incorrect</string>
 
+    <string name="error_connection">No internet connection</string>
+    <string name="error_server">Could not connect to server, please try again later</string>
+    <string name="error_timeout">Connection timeout</string>
+
     <string name="tab_client">Client</string>
     <string name="tab_volunteer">Volunteer</string>
 </resources>
