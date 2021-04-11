@@ -16,7 +16,7 @@ enum class RequestType {
 
 class HttpRequestManager {
     companion object {
-        private var token: String? = "71dd6925724ff3e902e27595adb1c3de13eb8757"
+        private var token: String? = null
         fun setToken(token: String) {
             this.token = token
         }
