@@ -24,13 +24,15 @@ import sk.koronapp.utilities.Urls
 
 class DemandRecyclerViewAdapter(
     private val context: Context,
-    private val demands: Array<Demand>,
-    private val client: Boolean = true
+    private val demands: List<Demand>,
+    private val client: Boolean? = null
 ) :
     RecyclerView.Adapter<DemandRecyclerViewAdapter.ViewHolder>() {
+    private val defaultImage =
+        BitmapFactory.decodeStream(context.resources.assets.open("default_avatar.png"))
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val viewId = if (client)
+        val viewId = if (client == null || client)
             R.layout.demand_list_item
         else
             R.layout.demand_list_item_avatar_right
@@ -47,8 +49,9 @@ class DemandRecyclerViewAdapter(
 
         val imageLoader = HttpRequestManager.getImageLoader(context)
         imageLoader.setProgressBar(holder.progressBar)
-        holder.avatar.setErrorImageBitmap(BitmapFactory.decodeStream(context.resources.assets.open("default_avatar.png")))
-        if (!client) {
+        holder.avatar.setErrorImageBitmap(defaultImage)
+        holder.avatar.setDefaultImageBitmap(defaultImage)
+        if (client == null || !client) {
             holder.avatar.setImageUrl(Urls.AVATAR + demand.client.avatar, imageLoader)
         } else if (demand.volunteer != null) {
             holder.avatar.setImageUrl(Urls.AVATAR + demand.volunteer.avatar, imageLoader)

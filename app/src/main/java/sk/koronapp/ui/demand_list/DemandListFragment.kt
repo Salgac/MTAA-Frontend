@@ -7,32 +7,38 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import kotlinx.android.synthetic.main.demand_list_item.view.*
 import org.json.JSONArray
 import sk.koronapp.R
 import sk.koronapp.models.Demand
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
 
-class DemandListFragment(private val queryPair: Pair<String, String>) : Fragment() {
+class DemandListFragment(private val queryPair: Pair<String, String>? = null) : Fragment() {
 
-    private lateinit var demandList: Array<Demand>
+    private lateinit var demandList: List<Demand>
     private lateinit var view: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var client = true
-        if (queryPair.first == "user") {
-            client = queryPair.second == "client"
+        var client: Boolean? = null
+        var query = ""
+        if (queryPair != null) {
+            client = true
+            if (queryPair.first == "user") {
+                client = queryPair.second == "client"
+            }
+            query = "?" + queryPair.first + "=" + queryPair.second
         }
         HttpRequestManager.sendRequestForJsonArray(
             requireContext(),
             RequestType.DEMAND,
             { jsonArray: JSONArray, success: Boolean ->
                 if (success) {
-                    demandList =
-                        ObjectMapper().readValue(jsonArray.toString(), Array<Demand>::class.java)
+                    demandList = ObjectMapper().readValue(
+                        jsonArray.toString(),
+                        object : TypeReference<List<Demand>>() {})
 
                     with(view) {
                         layoutManager = LinearLayoutManager(context)
@@ -42,8 +48,17 @@ class DemandListFragment(private val queryPair: Pair<String, String>) : Fragment
                     TODO("Error popup")
                 }
             },
-            "?" + queryPair.first + "=" + queryPair.second
+            query
         )
+    }
+
+    fun displayDemandsByAddress(address: String?) {
+        var demands = demandList
+        if (address != null)
+            demands = demandList.filter { it.address.toLowerCase().contains(address.toLowerCase()) }
+        with(view) {
+            view.adapter = DemandRecyclerViewAdapter(context, demands, null)
+        }
     }
 
     override fun onCreateView(

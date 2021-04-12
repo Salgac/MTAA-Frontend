@@ -12,10 +12,10 @@
         tools:layout="@layout/home_fragment" />
 
     <fragment
-            android:id="@+id/navigation_dashboard"
-            android:name="sk.koronapp.ui.dashboard.DashboardFragment"
-            android:label="@string/title_dashboard"
-            tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_dashboard"
+        android:name="sk.koronapp.ui.available_demands.AvailableDemands"
+        android:label="@string/title_available_demands"
+        tools:layout="@layout/available_demands" />
 
     <fragment
             android:id="@+id/navigation_notifications"
