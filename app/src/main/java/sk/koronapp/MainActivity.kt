@@ -1,5 +1,6 @@
 package sk.koronapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.widget.TextView
@@ -14,11 +15,13 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 import kotlinx.android.synthetic.main.drawer_layout.view.*
 import sk.koronapp.models.User
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.Urls
+import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
 
@@ -65,6 +68,11 @@ class MainActivity : AppCompatActivity() {
         header.drawer_name.text = user.username
         header.drawer_address.text = user.address
 
-
+        logout_button.setOnClickListener {
+            //return to Login page
+            val intent = Intent(this@MainActivity, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }
