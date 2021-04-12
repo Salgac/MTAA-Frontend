@@ -25,8 +25,8 @@ class DemandListFragment(private val queryPair: Pair<String, String>? = null) : 
         var client: Boolean? = null
         var query = ""
         if (queryPair != null) {
-            client = true
             if (queryPair.first == "user") {
+                client = true
                 client = queryPair.second == "client"
             }
             query = "?" + queryPair.first + "=" + queryPair.second

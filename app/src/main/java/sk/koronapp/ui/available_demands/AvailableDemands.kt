@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import sk.koronapp.R
+import sk.koronapp.models.Demand
 import sk.koronapp.ui.demand_list.DemandListFragment
 
 
@@ -17,10 +18,11 @@ class AvailableDemands : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.available_demands, container, false)
+        val root = inflater.inflate(R.layout.available_demands_fragment, container, false)
         val searchView: CustomSearchView = root.findViewById(R.id.demand_search)
 
-        val demandFragment = DemandListFragment()
+        val queryPair = Pair("state", Demand.State.created.toString())
+        val demandFragment = DemandListFragment(queryPair)
 
         childFragmentManager.beginTransaction()
             .add(R.id.demand_search_layout, demandFragment, "demand_fragment")

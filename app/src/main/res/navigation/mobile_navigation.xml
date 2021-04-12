@@ -15,7 +15,7 @@
         android:id="@+id/navigation_dashboard"
         android:name="sk.koronapp.ui.available_demands.AvailableDemands"
         android:label="@string/title_available_demands"
-        tools:layout="@layout/available_demands" />
+        tools:layout="@layout/available_demands_fragment" />
 
     <fragment
             android:id="@+id/navigation_notifications"
