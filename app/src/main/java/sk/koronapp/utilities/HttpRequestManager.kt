@@ -47,7 +47,7 @@ class HttpRequestManager {
                     if (noConnectionErrorPresent(context, error))
                         handlerFunction(JSONObject(String(error.networkResponse.data)), false)
                     else
-                        handlerFunction(JSONObject(),false)
+                        handlerFunction(JSONObject(), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
@@ -72,13 +72,35 @@ class HttpRequestManager {
                     if (noConnectionErrorPresent(context, error))
                         handlerFunction(JSONArray(String(error.networkResponse.data)), false)
                     else
-                        handlerFunction(JSONArray(),false)
+                        handlerFunction(JSONArray(), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
                 }
             }
             que.add(jsonArrayRequest)
+        }
+
+        //TODO
+        fun sendRequestWithImage(
+            context: Context,
+            type: RequestType,
+            imagePath: String,
+            handlerFunction: (response: JSONObject, success: Boolean) -> Unit
+        ) {
+            val que = Volley.newRequestQueue(context)
+            val url = getUrlFromType(type)
+
+            val multipartRequest = MultipartRequest(url, imagePath, token,
+                { response ->
+                    handlerFunction(JSONObject(response), true)
+                }, { error ->
+                    if (noConnectionErrorPresent(context, error))
+                        handlerFunction(JSONObject(String(error.networkResponse.data)), false)
+                    else
+                        handlerFunction(JSONObject(), false)
+                })
+            que.add(multipartRequest)
         }
 
         private val cache: LruCache<String, Bitmap> = LruCache<String, Bitmap>(20)

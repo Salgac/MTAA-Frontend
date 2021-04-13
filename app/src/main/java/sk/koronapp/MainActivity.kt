@@ -1,9 +1,11 @@
 package sk.koronapp
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.Menu
-import android.widget.TextView
+import android.provider.MediaStore
+import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -21,11 +23,13 @@ import kotlinx.android.synthetic.main.drawer_layout.view.*
 import sk.koronapp.models.User
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.Urls
-import java.io.Serializable
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var drawerNavView: NavigationView
+    private lateinit var bitmap: Bitmap
+    private val SELECT_IMAGE = 420
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
-        val drawerNavView: NavigationView = findViewById(R.id.drawer_nav_view)
+        drawerNavView = findViewById(R.id.drawer_nav_view)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
@@ -49,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        setDrawerValues(drawerNavView)
+        setDrawerValues()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -57,14 +61,18 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun setDrawerValues(view: NavigationView) {
+    private fun setDrawerValues() {
 
         val user: User = intent.getSerializableExtra("user") as User
 
-        val header = view.getHeaderView(0)
+        val header = drawerNavView.getHeaderView(0)
         val imageLoader = HttpRequestManager.getImageLoader(this)
 
-        header.drawer_image.setImageUrl(Urls.AVATAR + user.avatar, imageLoader)
+        if (this::bitmap.isInitialized)
+            header.drawer_image.setImageBitmap(bitmap)
+        else
+            header.drawer_image.setImageUrl(Urls.AVATAR + user.avatar, imageLoader)
+
         header.drawer_name.text = user.username
         header.drawer_address.text = user.address
 
@@ -73,6 +81,45 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, LoginActivity::class.java)
             startActivity(intent)
             finish()
+        }
+
+        header.drawer_image.setOnClickListener {
+            //load galery in new intent, and get the picked image in onActivityResult method
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, SELECT_IMAGE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == SELECT_IMAGE) {
+            if (resultCode == Activity.RESULT_OK) {
+                val path = data?.data
+
+                bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, path)
+
+                Toast.makeText(this, path?.path, Toast.LENGTH_LONG).show()
+
+                /*TODO spojazdnit toto!!!
+                if (path != null) {
+                    HttpRequestManager.sendRequestWithImage(this, RequestType.USER, path.path!!,
+                        fun(jsonObject: JSONObject, success: Boolean) {
+                            //handle errors
+                            if (!success) {
+                                //TODO handle error
+                                return
+                            }
+                            //update image in drawer from server
+                            setDrawerValues()
+                        })
+                }
+                */
+                setDrawerValues()
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //no image selected by user
+            }
         }
     }
 }
