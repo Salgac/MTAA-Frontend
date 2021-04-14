@@ -134,6 +134,7 @@ class LoginActivity : AppCompatActivity() {
                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
                 intent.putExtra("user", user as Serializable)
                 startActivity(intent)
+                finish()
             })
     }
 

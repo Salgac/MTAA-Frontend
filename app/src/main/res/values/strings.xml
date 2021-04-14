@@ -19,4 +19,8 @@
 
     <string name="tab_client">Client</string>
     <string name="tab_volunteer">Volunteer</string>
+
+    <string name="log_out">Log Out</string>
+    <string name="username_placeholder">Username</string>
+    <string name="address_placeholder">Address</string>
 </resources>
