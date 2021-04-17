@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.StrictMode
 import android.provider.MediaStore
 import android.widget.Toast
@@ -23,9 +24,13 @@ import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 import kotlinx.android.synthetic.main.drawer_layout.view.*
+import org.json.JSONObject
 import sk.koronapp.models.User
 import sk.koronapp.utilities.HttpRequestManager
+import sk.koronapp.utilities.RequestType
 import sk.koronapp.utilities.Urls
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
 
@@ -116,21 +121,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK) {
             if (data != null) {
                 bitmap = data.extras?.getParcelable("data")!!
+                sendImage()
             }
-            /*TODO spojazdnit toto!!!
-            if (path != null) {
-                HttpRequestManager.sendRequestWithImage(this, RequestType.USER, path.path!!,
-                    fun(jsonObject: JSONObject, success: Boolean) {
-                        //handle errors
-                        if (!success) {
-                            //TODO handle error
-                            return
-                        }
-                        //update image in drawer from server
-                        setDrawerValues()
-                    })
-            }
-            */
             setDrawerValues()
         }
     }
@@ -154,5 +146,31 @@ class MainActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(this, R.string.error_crop, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun sendImage() {
+        //save image into tmp storage
+        val storageDir: File? = this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+        val tempFile = File(storageDir, "Avatar.jpg")
+
+        val fOut = FileOutputStream(tempFile)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut)
+        fOut.flush()
+        fOut.close()
+
+        //get path and send to server
+        val fPath = tempFile.absolutePath
+        Toast.makeText(this, fPath, Toast.LENGTH_SHORT).show()
+
+        HttpRequestManager.sendRequestWithImage(this, RequestType.USER, fPath,
+            fun(jsonObject: JSONObject, success: Boolean) {
+                //handle errors
+                if (!success) {
+                    //TODO handle error
+                    return
+                }
+                //update image in drawer from server
+                setDrawerValues()
+            })
     }
 }

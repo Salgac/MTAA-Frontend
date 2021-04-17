@@ -4,10 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.LruCache
 import android.widget.Toast
-import com.android.volley.NetworkError
-import com.android.volley.ServerError
-import com.android.volley.TimeoutError
-import com.android.volley.VolleyError
+import com.android.volley.*
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
@@ -91,14 +88,13 @@ class HttpRequestManager {
             val que = Volley.newRequestQueue(context)
             val url = getUrlFromType(type)
 
-            val multipartRequest = MultipartRequest(url, imagePath, token,
+            val multipartRequest = VolleyMultipartRequest(
+                Request.Method.PUT, url,
                 { response ->
-                    handlerFunction(JSONObject(response), true)
+                    Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT).show()
                 }, { error ->
                     if (noConnectionErrorPresent(context, error))
-                        handlerFunction(JSONObject(String(error.networkResponse.data)), false)
-                    else
-                        handlerFunction(JSONObject(), false)
+                        Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
                 })
             que.add(multipartRequest)
         }
