@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.StrictMode
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -18,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.android.volley.toolbox.ImageLoader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_login.*
@@ -36,7 +38,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerNavView: NavigationView
-    private lateinit var bitmap: Bitmap
+    private lateinit var appBarHeader: View
+    private lateinit var imageLoader: ImageLoader
+
     private val SELECT_IMAGE = 420
     private val CROP_IMAGE = 69
 
@@ -53,6 +57,7 @@ class MainActivity : AppCompatActivity() {
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerNavView = findViewById(R.id.drawer_nav_view)
+        appBarHeader = drawerNavView.getHeaderView(0)
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
@@ -77,16 +82,11 @@ class MainActivity : AppCompatActivity() {
 
         val user: User = intent.getSerializableExtra("user") as User
 
-        val header = drawerNavView.getHeaderView(0)
-        val imageLoader = HttpRequestManager.getImageLoader(this)
+        imageLoader = HttpRequestManager.getImageLoader(this)
+        appBarHeader.drawer_image.setImageUrl(Urls.AVATAR + user.avatar, imageLoader)
 
-        if (this::bitmap.isInitialized)
-            header.drawer_image.setImageBitmap(bitmap)
-        else
-            header.drawer_image.setImageUrl(Urls.AVATAR + user.avatar, imageLoader)
-
-        header.drawer_name.text = user.username
-        header.drawer_address.text = user.address
+        appBarHeader.drawer_name.text = user.username
+        appBarHeader.drawer_address.text = user.address
 
         logout_button.setOnClickListener {
             //return to Login page
@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
-        header.drawer_image.setOnClickListener {
+        appBarHeader.drawer_image.setOnClickListener {
             //load galery in new intent, and get the picked image in onActivityResult method
             try {
                 val intent = Intent(
@@ -120,8 +120,8 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK) {
             if (data != null) {
-                bitmap = data.extras?.getParcelable("data")!!
-                sendImage()
+                val bitmap: Bitmap = data.extras?.getParcelable("data")!!
+                sendImage(bitmap)
             }
             setDrawerValues()
         }
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendImage() {
+    private fun sendImage(bitmap: Bitmap) {
         //save image into tmp storage
         val storageDir: File? = this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
         val tempFile = File(storageDir, "Avatar.jpg")
@@ -167,7 +167,11 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 //update image in drawer from server
-                setDrawerValues()
+                val newPath = jsonObject.get("file_path")
+                val user: User = intent.getSerializableExtra("user") as User
+                user.avatar = newPath as String
+
+                appBarHeader.drawer_image.setImageUrl(Urls.AVATAR + user.avatar, imageLoader)
             })
     }
 }
