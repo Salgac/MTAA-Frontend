@@ -1,12 +1,14 @@
 package sk.koronapp
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.os.StrictMode
 import android.provider.MediaStore
 import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,6 +17,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -30,10 +33,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawerNavView: NavigationView
     private lateinit var bitmap: Bitmap
     private val SELECT_IMAGE = 420
+    private val CROP_IMAGE = 69
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val builder = StrictMode.VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         toolbar.setTitleTextAppearance(this, R.style.MainTitle)
@@ -85,41 +92,67 @@ class MainActivity : AppCompatActivity() {
 
         header.drawer_image.setOnClickListener {
             //load galery in new intent, and get the picked image in onActivityResult method
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent, SELECT_IMAGE)
+            try {
+                val intent = Intent(
+                    Intent.ACTION_PICK,
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                )
+                startActivityForResult(intent, SELECT_IMAGE)
+            } catch (e: Exception) {
+                Toast.makeText(this, R.string.error_image, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == SELECT_IMAGE) {
-            if (resultCode == Activity.RESULT_OK) {
-                val path = data?.data
-
-                bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, path)
-
-                Toast.makeText(this, path?.path, Toast.LENGTH_LONG).show()
-
-                /*TODO spojazdnit toto!!!
-                if (path != null) {
-                    HttpRequestManager.sendRequestWithImage(this, RequestType.USER, path.path!!,
-                        fun(jsonObject: JSONObject, success: Boolean) {
-                            //handle errors
-                            if (!success) {
-                                //TODO handle error
-                                return
-                            }
-                            //update image in drawer from server
-                            setDrawerValues()
-                        })
-                }
-                */
-                setDrawerValues()
+        if (requestCode == SELECT_IMAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                val path = data.data
+                cropImage(path!!)
             }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //no image selected by user
+        }
+
+        if (requestCode == CROP_IMAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                bitmap = data.extras?.getParcelable("data")!!
             }
+            /*TODO spojazdnit toto!!!
+            if (path != null) {
+                HttpRequestManager.sendRequestWithImage(this, RequestType.USER, path.path!!,
+                    fun(jsonObject: JSONObject, success: Boolean) {
+                        //handle errors
+                        if (!success) {
+                            //TODO handle error
+                            return
+                        }
+                        //update image in drawer from server
+                        setDrawerValues()
+                    })
+            }
+            */
+            setDrawerValues()
+        }
+    }
+
+    private fun cropImage(path: Uri) {
+        try {
+            val intent = Intent("com.android.camera.action.CROP")
+            intent.setDataAndType(path, "image/*")
+            intent.putExtra("crop", true)
+
+            // indicate aspect of desired crop
+            intent.putExtra("aspectX", 1)
+            intent.putExtra("aspectY", 1)
+            intent.putExtra("outputX", 300)
+            intent.putExtra("outputY", 300)
+            intent.putExtra("scaleUpIfNeeded", true)
+
+            // retrieve data on return
+            intent.putExtra("return-data", true)
+            startActivityForResult(intent, CROP_IMAGE)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.error_crop, Toast.LENGTH_SHORT).show()
         }
     }
 }
