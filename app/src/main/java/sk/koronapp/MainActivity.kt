@@ -158,11 +158,8 @@ class MainActivity : AppCompatActivity() {
         fOut.flush()
         fOut.close()
 
-        //get path and send to server
-        val fPath = tempFile.absolutePath
-        Toast.makeText(this, fPath, Toast.LENGTH_SHORT).show()
-
-        HttpRequestManager.sendRequestWithImage(this, RequestType.USER, fPath,
+        //send to server as multipart
+        HttpRequestManager.sendRequestWithImage(this, RequestType.USER, tempFile.readBytes(),
             fun(jsonObject: JSONObject, success: Boolean) {
                 //handle errors
                 if (!success) {

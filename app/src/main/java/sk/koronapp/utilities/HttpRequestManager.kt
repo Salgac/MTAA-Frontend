@@ -82,20 +82,35 @@ class HttpRequestManager {
         fun sendRequestWithImage(
             context: Context,
             type: RequestType,
-            imagePath: String,
+            image: ByteArray,
             handlerFunction: (response: JSONObject, success: Boolean) -> Unit
         ) {
             val que = Volley.newRequestQueue(context)
             val url = getUrlFromType(type)
 
-            val multipartRequest = VolleyMultipartRequest(
-                Request.Method.PUT, url,
+            val multipartRequest = object : VolleyMultipartRequest(
+                Method.PUT, url,
                 { response ->
-                    Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT).show()
+                    handlerFunction(JSONObject(String(response.data)), true)
                 }, { error ->
                     if (noConnectionErrorPresent(context, error))
-                        Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
-                })
+                        handlerFunction(JSONObject(String(error.networkResponse.data)), false)
+                    else
+                        handlerFunction(JSONObject(), false)
+                }) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    val params: MutableMap<String, String> = HashMap()
+                    params["Authorization"] = "Token $token"
+                    params["Content-Disposition"] = "attachment; filename=avatar.jpg"
+                    return params
+                }
+
+                override fun getByteData(): MutableMap<String, DataPart> {
+                    val params: MutableMap<String, DataPart> = HashMap()
+                    params["file"] = DataPart("avatar.jpg", image, "image/jpeg")
+                    return params
+                }
+            }
             que.add(multipartRequest)
         }
 
