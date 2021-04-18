@@ -9,5 +9,5 @@ class User(
     @JsonProperty("address")
     val address: String,
     @JsonProperty("avatar")
-    val avatar: String
+    var avatar: String
 ) : Serializable
