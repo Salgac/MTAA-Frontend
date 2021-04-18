@@ -4,7 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.LruCache
 import android.widget.Toast
-import com.android.volley.*
+import com.android.volley.NetworkError
+import com.android.volley.ServerError
+import com.android.volley.TimeoutError
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
@@ -78,7 +81,6 @@ class HttpRequestManager {
             que.add(jsonArrayRequest)
         }
 
-        //TODO
         fun sendRequestWithImage(
             context: Context,
             type: RequestType,
@@ -128,6 +130,10 @@ class HttpRequestManager {
                     }
                 }
             )
+        }
+
+        fun removeFromCache(url: String) {
+            cache.remove("#W300#H300#S3$url")
         }
 
         fun defaultHeaders(): MutableMap<String, String> {

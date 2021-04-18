@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -157,6 +158,7 @@ class MainActivity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut)
         fOut.flush()
         fOut.close()
+        appBarHeader.drawer_image.setImageBitmap(BitmapFactory.decodeFile(tempFile.absolutePath))
 
         //send to server as multipart
         HttpRequestManager.sendRequestWithImage(this, RequestType.USER, tempFile.readBytes(),
@@ -170,8 +172,7 @@ class MainActivity : AppCompatActivity() {
                 val newPath = jsonObject.get("file_path")
                 val user: User = intent.getSerializableExtra("user") as User
                 user.avatar = newPath as String
-
-                appBarHeader.drawer_image.setImageUrl(Urls.AVATAR + user.avatar, imageLoader)
+                HttpRequestManager.removeFromCache(Urls.AVATAR + user.avatar)
             })
     }
 }
