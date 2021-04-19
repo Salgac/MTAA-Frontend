@@ -25,6 +25,7 @@
     <string name="username_placeholder">Username</string>
     <string name="address_placeholder">Address</string>
 
+
     <string name="demand_title">Demand title</string>
     <string name="delivery_address">Delivery Address</string>
     <string name="expiration_date">Expiration date</string>
@@ -39,4 +40,7 @@
     <string name="demand_button_accept">ACCEPT</string>
     <string name="demand_button_complete">COMPLETE</string>
     <string name="demand_button_approve">APPROVE</string>
+
+    <string name="splash">MTAA LS2021</string>
+
 </resources>
