@@ -2,6 +2,7 @@ package sk.koronapp
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarHeader: View
     private lateinit var imageLoader: ImageLoader
 
+    private val PREF_TOKEN: String = "token"
     private val SELECT_IMAGE = 420
     private val CROP_IMAGE = 69
 
@@ -92,6 +94,8 @@ class MainActivity : AppCompatActivity() {
         logout_button.setOnClickListener {
             //return to Login page
             val intent = Intent(this@MainActivity, LoginActivity::class.java)
+            getSharedPreferences("pref", Context.MODE_PRIVATE).edit().putString(PREF_TOKEN, null)
+                .apply()
             startActivity(intent)
             finish()
         }

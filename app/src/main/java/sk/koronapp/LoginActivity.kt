@@ -1,5 +1,6 @@
 package sk.koronapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,9 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var addressManager: AddressManager
     private var userIsDummy = false
+
+    private val PREF_TOKEN: String = "token"
+    private val PREF_USER: String = "user"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,7 +132,12 @@ class LoginActivity : AppCompatActivity() {
                 val userJson = jsonObject.getJSONObject("user")
                 val user = ObjectMapper().readValue(userJson.toString(), User::class.java)
 
+                //set token and preferences
                 HttpRequestManager.setToken(token)
+                getSharedPreferences("pref", Context.MODE_PRIVATE).edit()
+                    .putString(PREF_TOKEN, token)
+                    .putString(PREF_USER, userJson.toString())
+                    .apply()
 
                 //launch main activity
                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
