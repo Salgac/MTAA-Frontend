@@ -135,7 +135,7 @@ class LoginActivity : AppCompatActivity() {
 
 
                 //set token and preferences
-                HttpRequestManager.setToken(token)
+                HttpRequestManager.setUser(user)
                 getSharedPreferences("pref", Context.MODE_PRIVATE).edit()
                     .putString(PREF_TOKEN, token)
                     .putString(PREF_USER, userJson.toString())

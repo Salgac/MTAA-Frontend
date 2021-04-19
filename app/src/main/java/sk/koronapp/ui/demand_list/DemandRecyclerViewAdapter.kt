@@ -57,7 +57,10 @@ class DemandRecyclerViewAdapter(
         holder.avatar.setErrorImageBitmap(defaultImage)
         holder.avatar.setDefaultImageBitmap(defaultImage)
         if (client == null || !client) {
-            holder.avatar.setImageUrl(Urls.AVATAR + demand.client.username + ".png", imageLoader)
+            holder.avatar.setImageUrl(
+                Urls.AVATAR + demand.client.getUsernameUrlEncoded() + ".png",
+                imageLoader
+            )
         } else if (demand.volunteer != null) {
             holder.avatar.setImageUrl(
                 Urls.AVATAR + demand.volunteer!!.getUsernameUrlEncoded() + ".png",

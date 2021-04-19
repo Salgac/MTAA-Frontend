@@ -28,9 +28,9 @@ class SplashActivity : AppCompatActivity() {
 
         if (token != null) {
             //login user
-            HttpRequestManager.setToken(token)
             val userJson = pref.getString(PREF_USER, null)
             user = ObjectMapper().readValue(userJson.toString(), User::class.java)
+            HttpRequestManager.setUser(user)
         }
 
         Handler().postDelayed({
