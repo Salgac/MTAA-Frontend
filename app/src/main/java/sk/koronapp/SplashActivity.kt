@@ -30,6 +30,7 @@ class SplashActivity : AppCompatActivity() {
             //login user
             val userJson = pref.getString(PREF_USER, null)
             user = ObjectMapper().readValue(userJson.toString(), User::class.java)
+            user.token = token
             HttpRequestManager.setUser(user)
         }
 
