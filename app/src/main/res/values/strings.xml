@@ -25,4 +25,5 @@
     <string name="log_out">Log Out</string>
     <string name="username_placeholder">Username</string>
     <string name="address_placeholder">Address</string>
+    <string name="splash">MTAA LS2021</string>
 </resources>
