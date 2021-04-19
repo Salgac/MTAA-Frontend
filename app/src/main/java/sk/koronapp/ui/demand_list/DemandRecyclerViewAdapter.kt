@@ -108,7 +108,7 @@ class DemandRecyclerViewAdapter(
         )
     }
 
-    private fun onItemLongClicked(position: Int) {
+    private fun onDemandLongClicked(position: Int) {
         val demand = demands[position]
         val dialogBuilder = AlertDialog.Builder(context)
         dialogBuilder.setMessage("Do you want to delete demand " + demand.title + "?")
@@ -120,9 +120,8 @@ class DemandRecyclerViewAdapter(
                 Request.Method.DELETE,
                 fun(jsonObject: JSONObject, success: Boolean) {
                     demands.removeAt(position)
-                    this.notifyDataSetChanged()
+                    this.notifyItemRemoved(position)
                     dialog.dismiss()
-
                 },
                 demand.id.toString()
             )
@@ -143,7 +142,7 @@ class DemandRecyclerViewAdapter(
             }
             if (client == true) {
                 itemView.setOnLongClickListener {
-                    onItemLongClicked(adapterPosition)
+                    onDemandLongClicked(adapterPosition)
                     true
                 }
             }
