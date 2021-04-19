@@ -21,8 +21,12 @@ class AvailableDemands : Fragment() {
         val root = inflater.inflate(R.layout.available_demands_fragment, container, false)
         val searchView: CustomSearchView = root.findViewById(R.id.demand_search)
 
-        val queryPair = Pair("state", Demand.State.created.toString())
-        val demandFragment = DemandListFragment(queryPair)
+        val demandFragment = DemandListFragment(
+            mutableListOf(
+                Pair("state", Demand.State.created.toString()),
+                Pair("user", "none")
+            )
+        )
 
         childFragmentManager.beginTransaction()
             .add(R.id.demand_search_layout, demandFragment, "demand_fragment")

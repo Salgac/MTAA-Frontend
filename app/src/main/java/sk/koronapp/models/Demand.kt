@@ -7,29 +7,35 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Demand(
+class Demand : Serializable {
     @JsonProperty("id")
-    val id: Int,
+    var id: Int = 0
+
     @JsonProperty("address")
-    val address: String,
+    var address: String = ""
+
     @JsonProperty("title")
-    val title: String,
+    var title: String = ""
+
     @JsonProperty("created_at")
-    val createdAt: Date,
+    var createdAt: Date = Date()
+
     @JsonProperty("expired_at")
-    val expiredAt: Date,
+    var expiredAt: Date = Date()
+
     @JsonProperty("state")
-    val state: State,
+    var state: State = State.created
 
     @JsonProperty("client")
-    val client: User,
+    var client: User = User()
+
     @JsonProperty("volunteer")
-    val volunteer: User?,
+    var volunteer: User? = null
 
     @JsonProperty("items")
-    val items: List<Item>?
-) : Serializable {
-    private val formatter: SimpleDateFormat = SimpleDateFormat("dd.MM HH:mm", Locale.ENGLISH)
+    var items: List<Item>? = null
+
+    private var formatter: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH)
     fun expiredAtString(): String {
         return formatter.format(expiredAt)
     }

@@ -18,11 +18,15 @@ class TabFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(R.layout.home_tab_fragment, container, false)
 
-        val queryPair = Pair(
-            "user",
-            requireContext().resources.getString(TAB_TITLES[index - 1]).toLowerCase(Locale.ENGLISH)
+        val demandFragment = DemandListFragment(
+            mutableListOf(
+                Pair(
+                    "user",
+                    requireContext().resources.getString(TAB_TITLES[index - 1])
+                        .toLowerCase(Locale.ENGLISH)
+                )
+            )
         )
-        val demandFragment = DemandListFragment(queryPair)
         root.id = R.id.home_tab_fragment
         childFragmentManager.beginTransaction().add(root.id, demandFragment, "demand_fragment")
             .commit()

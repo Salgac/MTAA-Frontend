@@ -17,8 +17,8 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:screenOrientation="portrait"
-            android:name=".LoginActivity">
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,8 +27,12 @@
         </activity>
 
         <activity
-            android:screenOrientation="portrait"
-            android:name=".MainActivity" />
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.demand_detail.DemandDetailActivity"
+            android:label="@string/title_new_demand" />
 
         <meta-data
             android:name="preloaded_fonts"

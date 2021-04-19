@@ -1,6 +1,7 @@
 package sk.koronapp.ui.demand_list
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
@@ -18,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.json.JSONObject
 import sk.koronapp.R
 import sk.koronapp.models.Demand
+import sk.koronapp.ui.demand_detail.DemandDetailActivity
+import sk.koronapp.utilities.CustomImageLoader
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
 import sk.koronapp.utilities.Urls
@@ -31,7 +34,10 @@ class DemandRecyclerViewAdapter(
     private val defaultImage =
         BitmapFactory.decodeStream(context.resources.assets.open("default_avatar.png"))
 
+    private lateinit var imageLoader: CustomImageLoader
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        imageLoader = HttpRequestManager.getImageLoader(context)
         val viewId = if (client == null || client)
             R.layout.demand_list_item
         else
@@ -47,14 +53,16 @@ class DemandRecyclerViewAdapter(
         holder.address.text = demand.address
         holder.expiredAt.text = demand.expiredAtString()
 
-        val imageLoader = HttpRequestManager.getImageLoader(context)
         imageLoader.setProgressBar(holder.progressBar)
         holder.avatar.setErrorImageBitmap(defaultImage)
         holder.avatar.setDefaultImageBitmap(defaultImage)
         if (client == null || !client) {
-            holder.avatar.setImageUrl(Urls.AVATAR + demand.client.avatar, imageLoader)
+            holder.avatar.setImageUrl(Urls.AVATAR + demand.client.username + ".png", imageLoader)
         } else if (demand.volunteer != null) {
-            holder.avatar.setImageUrl(Urls.AVATAR + demand.volunteer.avatar, imageLoader)
+            holder.avatar.setImageUrl(
+                Urls.AVATAR + demand.volunteer!!.getUsernameUrlEncoded() + ".png",
+                imageLoader
+            )
         } else {
             holder.imageLayout.visibility = View.GONE
         }
@@ -81,10 +89,13 @@ class DemandRecyclerViewAdapter(
             { jsonObject: JSONObject, success: Boolean ->
                 if (success) {
                     val demand = ObjectMapper().readValue(jsonObject.toString(), Demand::class.java)
-                    TODO("Add demand activity as intent")
-//                            val intent = Intent(context, activity::class.java)
-//                            intent.putExtra("demand", demand as Serializable)
-//                            context.startActivity(intent)
+                    val intent = Intent(context, DemandDetailActivity::class.java)
+                    intent.putExtra("demand", demand)
+                    if (client == true)
+                        intent.putExtra("type", DemandDetailActivity.Type.CLIENT.value)
+                    else
+                        intent.putExtra("type", DemandDetailActivity.Type.VOLUNTEER.value)
+                    context.startActivity(intent)
                 } else {
                     TODO("Error popup")
                 }

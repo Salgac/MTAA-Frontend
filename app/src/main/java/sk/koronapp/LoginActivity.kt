@@ -12,7 +12,6 @@ import sk.koronapp.models.User
 import sk.koronapp.utilities.AddressManager
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
-import java.io.Serializable
 import java.util.*
 
 class LoginActivity : AppCompatActivity() {
@@ -124,15 +123,13 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 //create new user
-                val token = jsonObject.get("token").toString()
                 val userJson = jsonObject.getJSONObject("user")
                 val user = ObjectMapper().readValue(userJson.toString(), User::class.java)
-
-                HttpRequestManager.setToken(token)
+                user.token = jsonObject.get("token").toString()
+                HttpRequestManager.setUser(user)
 
                 //launch main activity
                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                intent.putExtra("user", user as Serializable)
                 startActivity(intent)
                 finish()
             })

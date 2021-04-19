@@ -15,7 +15,7 @@ import sk.koronapp.models.Demand
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
 
-class DemandListFragment(private val queryPair: Pair<String, String>? = null) : Fragment() {
+class DemandListFragment(private val queryPairs: List<Pair<String, String>>? = null) : Fragment() {
 
     private lateinit var demandList: List<Demand>
     private lateinit var view: RecyclerView
@@ -24,12 +24,17 @@ class DemandListFragment(private val queryPair: Pair<String, String>? = null) : 
         super.onCreate(savedInstanceState)
         var client: Boolean? = null
         var query = ""
-        if (queryPair != null) {
-            if (queryPair.first == "user") {
-                client = true
-                client = queryPair.second == "client"
+        if (queryPairs != null) {
+            for (pair in queryPairs) {
+                if (pair.first == "user") {
+                    client = true
+                    client = pair.second == "client"
+                }
+                if (query.isEmpty())
+                    query = "?" + pair.first + "=" + pair.second
+                else
+                    query += "&" + pair.first + "=" + pair.second
             }
-            query = "?" + queryPair.first + "=" + queryPair.second
         }
         HttpRequestManager.sendRequestForJsonArray(
             requireContext(),
