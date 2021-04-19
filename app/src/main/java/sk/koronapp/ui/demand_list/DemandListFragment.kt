@@ -17,7 +17,7 @@ import sk.koronapp.utilities.RequestType
 
 class DemandListFragment(private val queryPairs: List<Pair<String, String>>? = null) : Fragment() {
 
-    private lateinit var demandList: List<Demand>
+    private lateinit var demandList: MutableList<Demand>
     private lateinit var view: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,7 @@ class DemandListFragment(private val queryPairs: List<Pair<String, String>>? = n
                 if (success) {
                     demandList = ObjectMapper().readValue(
                         jsonArray.toString(),
-                        object : TypeReference<List<Demand>>() {})
+                        object : TypeReference<MutableList<Demand>>() {})
 
                     with(view) {
                         layoutManager = LinearLayoutManager(context)
@@ -61,6 +61,7 @@ class DemandListFragment(private val queryPairs: List<Pair<String, String>>? = n
         var demands = demandList
         if (address != null)
             demands = demandList.filter { it.address.toLowerCase().contains(address.toLowerCase()) }
+                .toMutableList()
         with(view) {
             view.adapter = DemandRecyclerViewAdapter(context, demands, null)
         }

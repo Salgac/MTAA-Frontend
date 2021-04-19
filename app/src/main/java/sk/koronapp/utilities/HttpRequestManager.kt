@@ -52,8 +52,10 @@ class HttpRequestManager {
                 { response ->
                     handlerFunction(response, true)
                 }, { error ->
-                    if (noConnectionErrorPresent(context, error))
+                    if (noConnectionErrorPresent(context, error) && error.networkResponse != null)
                         handlerFunction(JSONObject(String(error.networkResponse.data)), false)
+                    else
+                        handlerFunction(JSONObject(), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
@@ -151,7 +153,7 @@ class HttpRequestManager {
             return params
         }
 
-        private fun getUrlFromType(type: RequestType): String {
+        fun getUrlFromType(type: RequestType): String {
             return when (type) {
                 RequestType.LOGIN -> Urls.LOGIN
                 RequestType.REGISTER -> Urls.REGISTER
