@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">KoronApp</string>
     <string name="title_home">Home</string>
-    <string name="title_available_demands">Available demans</string>
-    <string name="title_notifications">Notifications</string>
-
+    <string name="title_available_demands">Available Demands</string>
+    <string name="title_new_demand">New Demand</string>
 
     <string name="register">Register</string>
     <string name="log_in">Log In</string>
@@ -25,5 +24,23 @@
     <string name="log_out">Log Out</string>
     <string name="username_placeholder">Username</string>
     <string name="address_placeholder">Address</string>
+
+
+    <string name="demand_title">Demand title</string>
+    <string name="delivery_address">Delivery Address</string>
+    <string name="expiration_date">Expiration date</string>
+
+    <string-array name="units">
+        <item>kg</item>
+        <item>pcs</item>
+    </string-array>
+
+    <string name="demand_button_create">CREATE</string>
+    <string name="demand_button_update">UPDATE</string>
+    <string name="demand_button_accept">ACCEPT</string>
+    <string name="demand_button_complete">COMPLETE</string>
+    <string name="demand_button_approve">APPROVE</string>
+
     <string name="splash">MTAA LS2021</string>
+
 </resources>

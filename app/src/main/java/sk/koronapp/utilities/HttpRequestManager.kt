@@ -15,6 +15,7 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
 import sk.koronapp.R
+import sk.koronapp.models.User
 
 enum class RequestType {
     LOGIN, REGISTER, USER, AVATAR, DEMAND
@@ -22,9 +23,13 @@ enum class RequestType {
 
 class HttpRequestManager {
     companion object {
-        private var token: String? = null
-        fun setToken(token: String) {
-            this.token = token
+        private var user: User? = null
+        fun setUser(user: User) {
+            this.user = user
+        }
+
+        fun getUser(): User? {
+            return user
         }
 
         //function that sends requests
@@ -37,7 +42,10 @@ class HttpRequestManager {
             urlExtra: String = ""
         ) {
             val que = Volley.newRequestQueue(context)
-            val url = getUrlFromType(type) + urlExtra
+            var url = getUrlFromType(type)
+            if (urlExtra.isNotEmpty()) {
+                url += "$urlExtra/"
+            }
 
             val jsonObjectRequest = object : JsonObjectRequest(
                 method, url, jsonObj,
@@ -46,8 +54,6 @@ class HttpRequestManager {
                 }, { error ->
                     if (noConnectionErrorPresent(context, error))
                         handlerFunction(JSONObject(String(error.networkResponse.data)), false)
-                    else
-                        handlerFunction(JSONObject(), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
@@ -102,7 +108,7 @@ class HttpRequestManager {
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     val params: MutableMap<String, String> = HashMap()
-                    params["Authorization"] = "Token $token"
+                    params["Authorization"] = "Token " + user!!.token
                     params["Content-Disposition"] = "attachment; filename=avatar.jpg"
                     return params
                 }
@@ -139,8 +145,8 @@ class HttpRequestManager {
         fun defaultHeaders(): MutableMap<String, String> {
             val params: MutableMap<String, String> = HashMap()
             params["Content-Type"] = "application/json"
-            if (token != null) {
-                params["Authorization"] = "Token $token"
+            if (user != null) {
+                params["Authorization"] = "Token " + user!!.token
             }
             return params
         }

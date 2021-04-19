@@ -26,6 +26,10 @@
         </activity>
 
         <activity
+            android:name=".ui.demand_detail.DemandDetailActivity"
+            android:label="@string/title_new_demand" />
+        
+        <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait" />
 

@@ -29,14 +29,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.drawer_layout.*
 import kotlinx.android.synthetic.main.drawer_layout.view.*
 import org.json.JSONObject
-import sk.koronapp.models.User
 import sk.koronapp.utilities.HttpRequestManager
 import sk.koronapp.utilities.RequestType
 import sk.koronapp.utilities.Urls
 import java.io.File
 import java.io.FileOutputStream
 
-class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerNavView: NavigationView
@@ -67,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
+                R.id.navigation_home, R.id.navigation_available_demands, R.id.navigation_new_demand
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -82,14 +81,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setDrawerValues() {
-
-        val user: User = intent.getSerializableExtra("user") as User
-
         imageLoader = HttpRequestManager.getImageLoader(this)
-        appBarHeader.drawer_image.setImageUrl(Urls.AVATAR + user.avatar, imageLoader)
+        appBarHeader.drawer_image.setImageUrl(
+            Urls.AVATAR + HttpRequestManager.getUser()!!.getUsernameUrlEncoded() + ".png",
+            imageLoader
+        )
 
-        appBarHeader.drawer_name.text = user.username
-        appBarHeader.drawer_address.text = user.address
+        appBarHeader.drawer_name.text = HttpRequestManager.getUser()!!.username
+        appBarHeader.drawer_address.text = HttpRequestManager.getUser()!!.address
 
         logout_button.setOnClickListener {
             //return to Login page
@@ -173,10 +172,9 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 //update image in drawer from server
-                val newPath = jsonObject.get("file_path")
-                val user: User = intent.getSerializableExtra("user") as User
-                user.avatar = newPath as String
-                HttpRequestManager.removeFromCache(Urls.AVATAR + user.avatar)
+                HttpRequestManager.removeFromCache(
+                    Urls.AVATAR + HttpRequestManager.getUser()!!.getUsernameUrlEncoded() + ".png"
+                )
             })
     }
 }

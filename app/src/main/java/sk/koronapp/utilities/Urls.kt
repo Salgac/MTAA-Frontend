@@ -7,7 +7,7 @@ class Urls {
         const val LOGIN = "$ROOT/login/"
         const val REGISTER = "$ROOT/register/"
         const val USER = "$ROOT/user/"
-        const val AVATAR = ROOT
+        const val AVATAR = "$ROOT/avatar/"
         const val DEMAND = "$ROOT/demand/"
     }
 }

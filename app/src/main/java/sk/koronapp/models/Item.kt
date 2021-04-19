@@ -5,15 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Item(
+class Item
+    : Serializable {
     @JsonProperty("id")
-    val id: Int,
+    var id: Int = 0
+
     @JsonProperty("name")
-    val name: String,
+    var name: String = ""
+
     @JsonProperty("quantity")
-    val quantity: Float,
+    var quantity: Float = 0F
+
     @JsonProperty("unit")
-    val unit: String,
+    var unit: String = ""
+
     @JsonProperty("price")
-    val price: Float
-) : Serializable
+    var price: Float = 0F
+}
