@@ -36,7 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Unit" />
+            android:text="Number" />
 
         <EditText
             android:id="@+id/new_item_quantity"
@@ -71,7 +71,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:inputType="number" />
+            android:inputType="numberDecimal" />
 
         <TextView
             android:layout_width="0dp"

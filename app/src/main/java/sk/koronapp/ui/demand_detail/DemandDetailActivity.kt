@@ -5,10 +5,7 @@ import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -233,23 +230,38 @@ class DemandDetailActivity : AppCompatActivity() {
     }
 
     private fun sendDemand(demand: Demand, method: Int, extra: String = "") {
-        val mapper = ObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        val jsonObject = JSONObject(mapper.writeValueAsString(demand))
+        if (demand.title.isEmpty()) {
+            Toast.makeText(this, "Demand title must not be empty", Toast.LENGTH_SHORT).show()
+        } else if (demand.address.isEmpty()) {
+            Toast.makeText(this, "Demand address must not be empty", Toast.LENGTH_SHORT).show()
+        } else if (demand.items!!.isEmpty()) {
+            Toast.makeText(this, "Demand must have at least one item", Toast.LENGTH_SHORT).show()
+        } else {
 
-        HttpRequestManager.sendRequest(
-            this,
-            jsonObject,
-            RequestType.DEMAND,
-            method,
-            fun(jsonObject: JSONObject, success: Boolean) {
-                if (success) {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-            },
-            extra
-        )
+            val mapper = ObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            val jsonObject = JSONObject(mapper.writeValueAsString(demand))
+
+            HttpRequestManager.sendRequest(
+                this,
+                jsonObject,
+                RequestType.DEMAND,
+                method,
+                fun(jsonObject: JSONObject, success: Boolean) {
+                    if (success) {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "Demand with title " + demand.title + " already exists",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                extra
+            )
+        }
     }
 
     private fun newItemDialog() {
@@ -280,15 +292,26 @@ class DemandDetailActivity : AppCompatActivity() {
         }
 
         btnAdd.setOnClickListener {
-            val item = Item()
-            item.name = nameEditText!!.text.toString()
-            item.quantity = quantityEditText!!.text.toString().toFloat()
-            item.unit = unitSpinner!!.selectedItem.toString()
-            item.price = priceEditText!!.text.toString().toFloat()
-            if (!adapter.addItem(item)) {
-                //TODO error - multiple items with same name
+            if (nameEditText!!.text.isEmpty()) {
+                Toast.makeText(this, "Item name is not filled", Toast.LENGTH_SHORT).show()
+            } else if (quantityEditText!!.text.isEmpty()) {
+                Toast.makeText(this, "Item number is not filled", Toast.LENGTH_SHORT).show()
             } else {
-                dialog.dismiss()
+                val item = Item()
+                item.name = nameEditText.text.toString()
+                item.quantity = quantityEditText.text.toString().toFloat()
+                item.unit = unitSpinner!!.selectedItem.toString()
+                if (priceEditText!!.text.isNotEmpty())
+                    item.price = priceEditText.text.toString().toFloat()
+                if (!adapter.addItem(item)) {
+                    Toast.makeText(
+                        this,
+                        "Item with name " + item.name + " already exists",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    dialog.dismiss()
+                }
             }
         }
     }
