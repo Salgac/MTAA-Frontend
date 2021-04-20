@@ -100,8 +100,6 @@ class DemandRecyclerViewAdapter(
                     else
                         intent.putExtra("type", DemandDetailActivity.Type.VOLUNTEER.value)
                     context.startActivity(intent)
-                } else {
-                    TODO("Error popup")
                 }
             },
             demandId.toString()

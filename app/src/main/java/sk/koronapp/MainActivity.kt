@@ -168,7 +168,6 @@ open class MainActivity : AppCompatActivity() {
             fun(jsonObject: JSONObject, success: Boolean) {
                 //handle errors
                 if (!success) {
-                    //TODO handle error
                     return
                 }
                 //update image in drawer from server

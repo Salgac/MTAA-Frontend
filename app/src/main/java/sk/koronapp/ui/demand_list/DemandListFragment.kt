@@ -49,8 +49,6 @@ class DemandListFragment(private val queryPairs: List<Pair<String, String>>? = n
                         layoutManager = LinearLayoutManager(context)
                         adapter = DemandRecyclerViewAdapter(context, demandList, client)
                     }
-                } else {
-                    TODO("Error popup")
                 }
             },
             query
