@@ -52,7 +52,9 @@ class HttpRequestManager {
                 { response ->
                     handlerFunction(response, true)
                 }, { error ->
-                    if (noConnectionErrorPresent(context, error) && error.networkResponse != null)
+                    if (error.networkResponse.statusCode == 400) {
+                        handlerFunction(JSONObject(), false)
+                    } else if (noConnectionErrorPresent(context, error))
                         handlerFunction(JSONObject(String(error.networkResponse.data)), false)
                     else
                         handlerFunction(JSONObject(), false)
@@ -153,7 +155,7 @@ class HttpRequestManager {
             return params
         }
 
-        fun getUrlFromType(type: RequestType): String {
+        private fun getUrlFromType(type: RequestType): String {
             return when (type) {
                 RequestType.LOGIN -> Urls.LOGIN
                 RequestType.REGISTER -> Urls.REGISTER

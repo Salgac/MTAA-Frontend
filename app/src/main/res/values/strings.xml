@@ -42,5 +42,6 @@
     <string name="demand_button_approve">APPROVE</string>
 
     <string name="splash">MTAA LS2021</string>
+    <string name="demand_not_accepted">Demand has not been accepted yet</string>
 
 </resources>

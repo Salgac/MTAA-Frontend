@@ -5,10 +5,7 @@ import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,6 +47,9 @@ class DemandDetailActivity : AppCompatActivity() {
     private lateinit var imageLoader: CustomImageLoader
     private lateinit var imageView: NetworkImageView
 
+    private val cal = Calendar.getInstance()
+    private val dateFormatter = SimpleDateFormat("dd.MM.yyyy")
+    private var color = R.color.stateCreated
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +62,12 @@ class DemandDetailActivity : AppCompatActivity() {
         itemRecyclerView = findViewById(R.id.item_list)
         itemRecyclerView.layoutManager = LinearLayoutManager(this)
 
+        cal.set(
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH) + 2
+        )
+
         imageView = findViewById(R.id.demand_avatar)
         imageLoader = HttpRequestManager.getImageLoader(this)
         if (intent.hasExtra("demand")) {
@@ -73,14 +79,25 @@ class DemandDetailActivity : AppCompatActivity() {
 
             adapter = ItemRecyclerViewAdapter(this, ArrayList(demand.items!!.toMutableList()))
 
+            when (demand.state) {
+                Demand.State.created -> color = R.color.stateCreated
+                Demand.State.accepted -> color = R.color.stateAccepted
+                Demand.State.completed -> color = R.color.stateCompleted
+                Demand.State.approved -> color = R.color.stateApproved
+                Demand.State.expired -> color = R.color.stateExpired
+            }
+
         } else {
             demand_detail_button.text = resources.getString(R.string.demand_button_create)
             adapter = ItemRecyclerViewAdapter(this, emptyArray<Item>().toMutableList())
+            demand_detail_expiration_date.setText(dateFormatter.format(cal.time))
         }
 
         itemRecyclerView.adapter = adapter
 
         demand_detail_new_item.visibility = View.GONE
+        toolbar.setBackgroundColor(resources.getColor(color))
+        toolbar.setContentScrimColor(resources.getColor(color))
 
         when (intent.getSerializableExtra("type")) {
             Type.NEW.value -> prepareEditableDemandLayout(false)
@@ -110,6 +127,7 @@ class DemandDetailActivity : AppCompatActivity() {
 
     private fun prepareVolunteerDemandLayout() {
         imageView.setImageUrl(Urls.AVATAR + demand.client.username + ".png", imageLoader)
+        demand_detail_username.text = demand.client.username
         when (demand.state) {
             Demand.State.created -> {
                 demand_detail_button.text = resources.getString(R.string.demand_button_accept)
@@ -140,10 +158,12 @@ class DemandDetailActivity : AppCompatActivity() {
                 imageLoader
             )
         }
+        demand_detail_username.text = demand.volunteer?.username
         when (demand.state) {
             Demand.State.created -> {
                 demand_detail_button.text = resources.getString(R.string.demand_button_update)
                 prepareEditableDemandLayout(true)
+                demand_detail_username.text = getString(R.string.demand_not_accepted)
             }
             Demand.State.accepted -> {
                 demand_detail_button.text = resources.getString(R.string.demand_button_complete)
@@ -178,12 +198,6 @@ class DemandDetailActivity : AppCompatActivity() {
         }
 
         demand_detail_expiration_date.setOnClickListener {
-            val cal = Calendar.getInstance()
-            cal.set(
-                cal.get(Calendar.YEAR),
-                cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH) + 2
-            )
             val listener =
                 OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
                     demand_detail_expiration_date.setText("$dayOfMonth." + (monthOfYear + 1) + ".$year")
@@ -206,7 +220,7 @@ class DemandDetailActivity : AppCompatActivity() {
             demand.title = demand_detail_title.text.toString()
             demand.address = demand_detail_address.text.toString()
             demand.expiredAt =
-                SimpleDateFormat("dd.MM.yyyy").parse(demand_detail_expiration_date.text.toString())
+                dateFormatter.parse(demand_detail_expiration_date.text.toString())
             if (update)
                 sendDemand(demand, Request.Method.PUT, demand.id.toString())
             else
@@ -216,23 +230,38 @@ class DemandDetailActivity : AppCompatActivity() {
     }
 
     private fun sendDemand(demand: Demand, method: Int, extra: String = "") {
-        val mapper = ObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        val jsonObject = JSONObject(mapper.writeValueAsString(demand))
+        if (demand.title.isEmpty()) {
+            Toast.makeText(this, "Demand title must not be empty", Toast.LENGTH_SHORT).show()
+        } else if (demand.address.isEmpty()) {
+            Toast.makeText(this, "Demand address must not be empty", Toast.LENGTH_SHORT).show()
+        } else if (demand.items!!.isEmpty()) {
+            Toast.makeText(this, "Demand must have at least one item", Toast.LENGTH_SHORT).show()
+        } else {
 
-        HttpRequestManager.sendRequest(
-            this,
-            jsonObject,
-            RequestType.DEMAND,
-            method,
-            fun(jsonObject: JSONObject, success: Boolean) {
-                if (success) {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-            },
-            extra
-        )
+            val mapper = ObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            val jsonObject = JSONObject(mapper.writeValueAsString(demand))
+
+            HttpRequestManager.sendRequest(
+                this,
+                jsonObject,
+                RequestType.DEMAND,
+                method,
+                fun(jsonObject: JSONObject, success: Boolean) {
+                    if (success) {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "Demand with title " + demand.title + " already exists",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                extra
+            )
+        }
     }
 
     private fun newItemDialog() {
@@ -263,15 +292,26 @@ class DemandDetailActivity : AppCompatActivity() {
         }
 
         btnAdd.setOnClickListener {
-            val item = Item()
-            item.name = nameEditText!!.text.toString()
-            item.quantity = quantityEditText!!.text.toString().toFloat()
-            item.unit = unitSpinner!!.selectedItem.toString()
-            item.price = priceEditText!!.text.toString().toFloat()
-            if (!adapter.addItem(item)) {
-                //TODO error - multiple items with same name
+            if (nameEditText!!.text.isEmpty()) {
+                Toast.makeText(this, "Item name is not filled", Toast.LENGTH_SHORT).show()
+            } else if (quantityEditText!!.text.isEmpty()) {
+                Toast.makeText(this, "Item number is not filled", Toast.LENGTH_SHORT).show()
             } else {
-                dialog.dismiss()
+                val item = Item()
+                item.name = nameEditText.text.toString()
+                item.quantity = quantityEditText.text.toString().toFloat()
+                item.unit = unitSpinner!!.selectedItem.toString()
+                if (priceEditText!!.text.isNotEmpty())
+                    item.price = priceEditText.text.toString().toFloat()
+                if (!adapter.addItem(item)) {
+                    Toast.makeText(
+                        this,
+                        "Item with name " + item.name + " already exists",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    dialog.dismiss()
+                }
             }
         }
     }
