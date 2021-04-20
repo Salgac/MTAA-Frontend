@@ -44,7 +44,7 @@ open class MainActivity : AppCompatActivity() {
 
     private val PREF_TOKEN: String = "token"
     private val SELECT_IMAGE = 420
-    private val CROP_IMAGE = 69
+    private val CROP_IMAGE = 69 //nice
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
