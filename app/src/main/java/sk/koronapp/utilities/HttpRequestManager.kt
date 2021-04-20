@@ -56,6 +56,8 @@ class HttpRequestManager {
                         handlerFunction(JSONObject(), false)
                     } else if (noConnectionErrorPresent(context, error))
                         handlerFunction(JSONObject(String(error.networkResponse.data)), false)
+                    else
+                        handlerFunction(JSONObject(), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
                     return defaultHeaders()
