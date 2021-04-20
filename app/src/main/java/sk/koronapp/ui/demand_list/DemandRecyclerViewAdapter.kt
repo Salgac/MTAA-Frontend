@@ -1,5 +1,6 @@
 package sk.koronapp.ui.demand_list
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -27,7 +28,7 @@ import sk.koronapp.utilities.Urls
 
 class DemandRecyclerViewAdapter(
     private val context: Context,
-    private val demands: List<Demand>,
+    private val demands: MutableList<Demand>,
     private val client: Boolean? = null
 ) :
     RecyclerView.Adapter<DemandRecyclerViewAdapter.ViewHolder>() {
@@ -107,6 +108,30 @@ class DemandRecyclerViewAdapter(
         )
     }
 
+    private fun onDemandLongClicked(position: Int) {
+        val demand = demands[position]
+        val dialogBuilder = AlertDialog.Builder(context)
+        dialogBuilder.setMessage("Do you want to delete demand " + demand.title + "?")
+        dialogBuilder.setPositiveButton("Yes") { dialog, which ->
+            HttpRequestManager.sendRequest(
+                context,
+                null,
+                RequestType.DEMAND,
+                Request.Method.DELETE,
+                fun(jsonObject: JSONObject, success: Boolean) {
+                    demands.removeAt(position)
+                    this.notifyItemRemoved(position)
+                    dialog.dismiss()
+                },
+                demand.id.toString()
+            )
+        }
+        dialogBuilder.setNegativeButton("No") { dialog, which ->
+            dialog.cancel()
+        }
+        dialogBuilder.show()
+    }
+
     override fun getItemCount(): Int = demands.size
 
     inner class ViewHolder(view: View, onItemClicked: (Int) -> Unit) :
@@ -114,6 +139,12 @@ class DemandRecyclerViewAdapter(
         init {
             itemView.setOnClickListener {
                 onItemClicked(adapterPosition)
+            }
+            if (client == true) {
+                itemView.setOnLongClickListener {
+                    onDemandLongClicked(adapterPosition)
+                    true
+                }
             }
         }
 
