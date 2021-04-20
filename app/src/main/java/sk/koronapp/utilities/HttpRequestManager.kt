@@ -52,11 +52,12 @@ class HttpRequestManager {
                 { response ->
                     handlerFunction(response, true)
                 }, { error ->
-                    if (error.networkResponse.statusCode == 400) {
-                        handlerFunction(JSONObject(), false)
-                    } else if (noConnectionErrorPresent(context, error))
-                        handlerFunction(JSONObject(String(error.networkResponse.data)), false)
-                    else
+                    if (error.networkResponse != null) {
+                        if (error.networkResponse.statusCode == 400) {
+                            handlerFunction(JSONObject(), false)
+                        } else if (noConnectionErrorPresent(context, error))
+                            handlerFunction(JSONObject(String(error.networkResponse.data)), false)
+                    } else
                         handlerFunction(JSONObject(), false)
                 }) {
                 override fun getHeaders(): MutableMap<String, String> {
